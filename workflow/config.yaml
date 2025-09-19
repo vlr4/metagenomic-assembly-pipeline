@@ -25,9 +25,8 @@ output:
   qc:
     read_qc: "read_qc"
   assembly:
-    rawdata: "NGS_rawdata"
-    hybrid_temp: "hybrid_temp"
     spades: "hybrid_temp/spades"
+  binning:
     binning: "hybrid_temp/binning"
 
 
