@@ -10,7 +10,8 @@ rule preassembly:
     threads: config["spades"]["threads"]
 #    conda: "../envs/spades.yaml"
     shell:
-        r"""
+        """
+        source activate metawrap-env
         mkdir -p {config[output][assembly][spades]}
         spades.py {config[spades][options]} \
           -1 {input.r1} -2 {input.r2} \
