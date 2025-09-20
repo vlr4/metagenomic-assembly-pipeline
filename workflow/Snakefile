@@ -30,7 +30,7 @@ rule all:
 
 ##### load rules #####
 #include: "rules/nano_dehost.smk"
-include: "rules/read_qc.smk"
-#include: "rules/preassembly.smk"
+#include: "rules/read_qc.smk"
+include: "rules/preassembly.smk"
 #include: "rules/binning.smk"
 
