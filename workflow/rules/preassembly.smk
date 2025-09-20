@@ -1,8 +1,8 @@
 rule preassembly:
     input:
-        r1 = lambda wc: f"{config["output"]["qc"]["read_qc"]}/{wc.sample}/final_pure_reads_1.fastq",
-        r2 = lambda wc: f"{config["output"]["qc"]["read_qc"]}/{wc.sample}/final_pure_reads_2.fastq",
-        nano = lambda wc: f"{config["output"]["dehost"]["sam"]}/nano.{wc.sample}.dehost.fq.gz",
+        r1 = lambda wc: str(base / f"{config["output"]["qc"]["read_qc"]}/{wc.sample}/final_pure_reads_1.fastq"),
+        r2 = lambda wc: str(base / f"{config["output"]["qc"]["read_qc"]}/{wc.sample}/final_pure_reads_2.fastq"),
+        nano = lambda wc: str(base / f"{config["output"]["dehost"]["sam"]}/nano.{wc.sample}.dehost.fq.gz"),
     output:
         spades_contigs = str(base / f"{config["output"]["assembly"]["spades"]}/{{sample}}_assembly/contigs.fasta"), 
     params:
