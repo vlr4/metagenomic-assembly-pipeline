@@ -34,11 +34,11 @@ output:
 threads:
   dehost: 20
   qc: 60
-  preassembly: 16
+  spades: 16
 mem:
   dehost: "16G"
   qc: "16G"
-  preassembly: "32G"
+  spades: "32G"
 
 # Tool-specific parameters
 minimap2:
