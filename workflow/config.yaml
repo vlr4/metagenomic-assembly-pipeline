@@ -41,7 +41,7 @@ mem:
   dehost: "16G"
   qc: "16G"
   spades: "32G"
-  binning: "125"
+  binning: "125G"
 
 # Tool-specific parameters
 minimap2:
