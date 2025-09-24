@@ -24,7 +24,7 @@ with open(config["samples"]) as f:
 ##### entry point #####
 rule all:
     input:
-        expand(directory(base / config["output"]["binning"]["binning"] / "{sample}_binning" / "maxbin2_bins"), sample=SAMPLES) 
+       directory(expand(str(base / config["output"]["binning"]["binning"] / "{sample}_binning" / "maxbin2_bins"), sample=SAMPLES)) 
 #        expand(str(base / config["output"]["assembly"]["spades"] / "{sample}_assembly" / "contigs.fasta"), sample=SAMPLES) 
 #        expand(str(base / config["output"]["qc"]["read_qc"] / "{sample}" / "final_pure_reads_1.fastq"), sample=SAMPLES)
 #        expand(str(base / config["output"]["dehost"]["sam"] / "nano.{sample}.dehost.fq.gz"), sample=SAMPLES)
