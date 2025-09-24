@@ -5,10 +5,10 @@ rule binning:
         r2 = lambda wc: str(base / f"{config['output']['qc']['read_qc']}/{wc.sample}/final_pure_reads_2.fastq")
     output:
 #        concoct_dir = directory(base / f"{config['output']['assembly']['binning']}/{{sample}}_binning/concoct_bins")
-        metabat2_dir = directory(base / f"{config['output']['assembly']['binning']}/{{sample}}_binning/metabat2_bins")
-        maxbin2_dir = directory(base / f"{config['output']['assembly']['binning']}/{{sample}}_binning/maxbin2_bins")
+        metabat2 = str(base / f"{config['output']['assembly']['binning']}/{{sample}}_binning/metabat2_bins/bin.1.fa"),
+        maxbin2 = str(base / f"{config['output']['assembly']['binning']}/{{sample}}_binning/maxbin2_bins/bin.1.fa")
     params: 
-        bin_dir = str(base / {config['output']['assembly']['binning']})
+        bin_dir = str(base / {config['output']['assembly']['binning']}),
         sample_dir = str(base / f"{config['output']['assembly']['binning']}/{{sample}}_binning")
     threads: config["threads"]["binning"]
 #    conda: "../envs/metawrap.yaml"
