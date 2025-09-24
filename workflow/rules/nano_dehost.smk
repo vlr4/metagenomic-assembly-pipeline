@@ -1,12 +1,12 @@
 rule nano_dehost:
     input:
-        fastq = lambda wildcards: f"{config["input"]["long_reads"]}/{wildcards.sample}.fastq",
+        fastq = lambda wildcards: f"{config['input']['long_reads']}/{wildcards.sample}.fastq",
         ref = config["reference"]["human"]
     output:
-        sam = str(base / f"{config["output"]["dehost"]["sam"]}/{{sample}}.sam"),
-        unmapped = str(base / f"{config["output"]["dehost"]["sam"]}/{{sample}}.unmapped.names"),
-        copied = str(base / f"{config["output"]["dehost"]["result"]}/{{sample}}.unmapped.names"),
-        dehosted = str(base / f"{config["output"]["dehost"]["sam"]}/nano.{{sample}}.dehost.fq.gz")
+        sam = str(base / f"{config['output']['dehost']['sam']}/{{sample}}.sam"),
+        unmapped = str(base / f"{config['output']['dehost']['sam']}/{{sample}}.unmapped.names"),
+        copied = str(base / f"{config['output']['dehost']['result']}/{{sample}}.unmapped.names"),
+        dehosted = str(base / f"{config['output']['dehost']['sam']}/nano.{{sample}}.dehost.fq.gz")
     params:
         sam_dir = str(base / config["output"]["dehost"]["sam"]),
         result_dir = str(base / config["output"]["dehost"]["result"]),
