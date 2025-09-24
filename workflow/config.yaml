@@ -26,7 +26,6 @@ output:
     read_qc: "read_qc"
   assembly:
     spades: "hybrid_temp/spades"
-  binning:
     binning: "hybrid_temp/binning"
      
 
