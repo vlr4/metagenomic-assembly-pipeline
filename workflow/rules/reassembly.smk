@@ -4,7 +4,7 @@ rule reassembly:
         r2 = lambda wc: str(base / f"{config["output"]["qc"]["read_qc"]}/{wc.sample}/final_pure_reads_2.fastq"),
         refined = lambda wc: f"m/{wc.sample}_binning/bin_refinement/metawrap_70_10_bins"   
     output:
-        stats = f"m/{{sample}}_binning/bin_reassembly/reassembled_bins.stats"
+        stats = f"m/{{sample}}_binning/bin_reassembly/reassembled_bins.stats",
         plot = f"m/{{sample}}_binning/bin_reassembly/reassembly_results.png"
     params:
         out_dir = f"m/{{sample}}_binning/bin_reassembly"
