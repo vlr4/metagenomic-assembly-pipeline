@@ -36,7 +36,8 @@ rule all:
 #include: "rules/nano_dehost.smk"
 #include: "rules/read_qc.smk"
 #include: "rules/preassembly.smk"
-include: "rules/binning.smk"
+#include: "rules/binning.smk"
+include: "rules/bin_refinement.smk"
 
 
 ##### utility rules #####
