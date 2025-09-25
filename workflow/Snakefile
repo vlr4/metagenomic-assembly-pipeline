@@ -44,9 +44,10 @@ include: "rules/bin_refinement.smk"
 # Create shorter symlinked paths for refined bins (avoids CheckM path-length issues)
 rule symlink_binning:
     output:
-        "m"
+        directory("m")
+    params:
+        target_path = str(base / "hybrid_temp/binning")
     shell:
         """
-        ln -sfn {base}/hybrid_temp/binning {output}
+        ln -sfn {params.target_path} {output}
         """
-
