@@ -14,7 +14,6 @@ rule bin_refinement:
         """
         source activate metawrap-env
         export PATH=/mnt/apps/users/vtelizhe/conda/envs/metawrap-env/bin:$PATH
-        export PYTHONPATH="/mnt/apps/users/vtelizhe/conda/envs/metawrap-env/lib/python2.7/site-packages:${PYTHONPATH:-}"
         mkdir -p {params.out_dir}
         metawrap bin_refinement \
           -o {params.out_dir} \
