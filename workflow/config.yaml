@@ -36,11 +36,13 @@ threads:
   qc: 60
   spades: 16
   binning: 12
+  refinement: 4
 mem:
   dehost: "16G"
   qc: "16G"
   spades: "32G"
   binning: "125G"
+  refinement: "64G"
 
 # Tool-specific parameters
 minimap2:

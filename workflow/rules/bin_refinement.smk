@@ -1,24 +1,24 @@
 rule bin_refinement:
     input:
-        metabat2=lambda wc: f"{config['output']['assembly']['binning']}/{wc.sample}_binning/metabat2_bins",
-        maxbin2=lambda wc: f"{config['output']['assembly']['binning']}/{wc.sample}_binning/maxbin2_bins",
-        concoct=lambda wc: f"{config['output']['assembly']['binning']}/{wc.sample}_binning/concoct_bins"
+        metabat2 = lambda wc: f"m/{wc.sample}_binning/metabat2_bins",
+        maxbin2 = lambda wc: f"m/{wc.sample}_binning/maxbin2_bins",
+        concoct = lambda wc: f"m/{wc.sample}_binning/concoct_bins"
     output:
-        dir=lambda wc: f"{config['output']['assembly']['binning']}/{wc.sample}/bin_refinement"
-    threads: 4
-    conda: "../envs/metawrap.yaml"
-    log:
-        out=lambda wc: f"logs_refinement/{wc.sample}.out",
-        err=lambda wc: f"logs_refinement/{wc.sample}.err"
+        stats = f"m/{{sample}}_binning/bin_refinement/metawrap_70_10_bins.stats"
+    params:
+        out_dir = f"m/{{sample}}_binning/bin_refinement"
+    threads: config["threads"]["refinement"]
+#    conda: "../envs/metawrap.yaml"
+    
     shell:
-        r"""
-        mkdir -p {output.dir}
+        """
+        source activate metawrap-env
+        mkdir -p {params.out_dir}
         metawrap bin_refinement \
-          -o {output.dir} \
+          -o {params.out_dir} \
           -A {input.metabat2} \
           -B {input.maxbin2} \
           -C {input.concoct} \
           -c 70 -x 10 \
-          -t {threads} \
-          1> {log.out} 2> {log.err}
+          -t {threads}
         """

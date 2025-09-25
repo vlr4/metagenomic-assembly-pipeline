@@ -6,7 +6,7 @@ min_version("8.8.0")
 
 configfile: "config.yaml"
 
-##### resolve global paths from data_dir #####
+##### resolve global paths from data_dir for input and databases #####
 base = Path(config["data_dir"])
 config["samples"] = str(base / config["samples"])
 for k in ("long_reads", "short_reads", "read_qc", "dehost"):
@@ -24,7 +24,8 @@ with open(config["samples"]) as f:
 ##### entry point #####
 rule all:
     input:
-        expand(str(base / config["output"]["assembly"]["binning"] / "{sample}_binning/concoct_bins/bin.1.fa"), sample=SAMPLES)
+        expand("m/{sample}_binning/bin_refinement/metawrap_70_10_bins.stats", sample=SAMPLES)
+#        expand("m/{sample}_binning/concoct_bins/bin.1.fa"), sample=SAMPLES)
 #        expand(str(base / config["output"]["assembly"]["binning"] / "{sample}_binning/metabat2_bins/bin.1.fa"), sample=SAMPLES),
 #        expand(str(base / config["output"]["assembly"]["binning"] / "{sample}_binning/maxbin2_bins/bin.1.fa"), sample=SAMPLES) 
 #        expand(str(base / config["output"]["assembly"]["spades"] / "{sample}_assembly" / "contigs.fasta"), sample=SAMPLES) 
@@ -36,4 +37,15 @@ rule all:
 #include: "rules/read_qc.smk"
 #include: "rules/preassembly.smk"
 include: "rules/binning.smk"
+
+
+##### utility rules #####
+# Create shorter symlinked paths for refined bins (avoids CheckM path-length issues)
+rule symlink_binning:
+    output:
+        "m"
+    shell:
+        """
+        ln -sfn {base}/hybrid_temp/binning {output}
+        """
 
