@@ -10,7 +10,9 @@ rule reassembly:
         out_dir = f"m/{{sample}}_binning/bin_reassembly"
     
 #    conda: "../envs/metawrap.yaml"
-    
+    threads: 4
+    resources:
+        mem_mb = 200000
     shell:
         """
         source activate metawrap-env
