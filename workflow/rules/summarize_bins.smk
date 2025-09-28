@@ -17,11 +17,12 @@ rule summarize_bins:
 
         for stats in {input}; do
             sample=$(basename $(dirname $(dirname "$stats")) | sed 's/_binning//')
-            tail -n +2 "$stats" | while IFS=$'\t' read -r fa completeness contamination GC lineage N50 size; do
-                echo "${sample}_${completeness}_${contamination}_${fa}.fa,${completeness},${contamination},${GC},${lineage},${N50},${size}" >> "$csv_out"
+            tail -n +2 "$stats" | while IFS=$'\\t' read -r fa completeness contamination GC lineage N50 size; do
+                echo "${{sample}}_${{completeness}}_${{contamination}}_${{fa}}.fa,${{completeness}},${{contamination}},${{GC}},${{lineage}},${{N50}},${{size}}" >> "$csv_out"
 
-                cp m/${sample}_binning/bin_reassembly/reassembled_bins/${fa}.fa \
-                   {params.outdir}/${sample}_${completeness}_${contamination}_${fa}.fa
+                cp m/${{sample}}_binning/bin_reassembly/reassembled_bins/${{fa}}.fa \
+                   {params.outdir}/${{sample}}_${{completeness}}_${{contamination}}_${{fa}}.fa
             done
         done
         """
+
