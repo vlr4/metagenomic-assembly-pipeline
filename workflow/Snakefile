@@ -53,4 +53,5 @@ rule all:
 #include: "rules/assembly.smk"
 #include: "rules/binning.smk"
 #include: "rules/bin_refinement.smk"
-include: "rules/reassembly.smk"
+#include: "rules/reassembly.smk"
+include: "rules/summarize_bins.smk"
