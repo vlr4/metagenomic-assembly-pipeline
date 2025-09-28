@@ -37,7 +37,8 @@ with open(config["samples"]) as f:
 ##### entry point #####
 rule all:
     input:
-        expand("m/{sample}_binning/bin_reassembly/reassembly_results.png", sample=SAMPLES)
+        expand(str(base / "result/metawrap_bins/hybrid/{sample}_*.fa"), sample=SAMPLES)
+#        expand("m/{sample}_binning/bin_reassembly/reassembly_results.png", sample=SAMPLES)
 #        expand("m/{sample}_binning/bin_refinement/metawrap_70_10_bins.stats", sample=SAMPLES)
 #        expand("m/{sample}_binning/concoct_bins/bin.1.fa"), sample=SAMPLES)
 #        expand(str(base / config["output"]["assembly"]["binning"] / "{sample}_binning/metabat2_bins/bin.1.fa"), sample=SAMPLES),
