@@ -14,7 +14,7 @@ rule dereplication:
         """
         source activate drep
         dRep dereplicate {params.outdir} \
-            -g {input.bins}*fa \
+            -g {input.bins}/*fa \
             -pa 0.9 -sa 0.95 -nc 0.30 -cm larger \
             -comp 70 -con 10 \
             -p {threads} \
