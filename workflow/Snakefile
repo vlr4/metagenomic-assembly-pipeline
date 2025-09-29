@@ -37,7 +37,8 @@ with open(config["samples"]) as f:
 ##### entry point #####
 rule all:
     input:
-        str(base / "result/metawrap_bins/hybrid/hybrid_genomeInfo.csv")
+        str(base / "hybrid_temp/drep/hybrid/Cdb.csv")
+#        str(base / "result/metawrap_bins/hybrid/hybrid_genomeInfo.csv")
 #        expand("m/{sample}_binning/bin_reassembly/reassembly_results.png", sample=SAMPLES)
 #        expand("m/{sample}_binning/bin_refinement/metawrap_70_10_bins.stats", sample=SAMPLES)
 #        expand("m/{sample}_binning/concoct_bins/bin.1.fa"), sample=SAMPLES)
@@ -54,4 +55,5 @@ rule all:
 #include: "rules/binning.smk"
 #include: "rules/bin_refinement.smk"
 #include: "rules/reassembly.smk"
-include: "rules/summarize_bins.smk"
+#include: "rules/summarize_bins.smk"
+include: "rules/dereplication.smk"
