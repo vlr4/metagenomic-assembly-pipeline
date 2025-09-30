@@ -1,4 +1,4 @@
-# Path to data
+# Main working (data) directory
 data_dir: "/mnt/shared/scratch/vtelizhe/metagenomic_networks/01test"
 
 # Sample design file
@@ -15,7 +15,8 @@ input:
 # Reference genomes / databases
 reference:
   human: "hg38.fa"
-  bacteria: "gtdb_bacteria.fa"
+gtdbtk:
+  mash_db: "db/release226/mash_db"
 
 # Output directories
 output:
