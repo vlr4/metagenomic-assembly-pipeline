@@ -1,4 +1,4 @@
-rule preassembly:
+rule assembly:
     input:
         r1 = lambda wc: str(base / f"{config["output"]["qc"]["read_qc"]}/{wc.sample}/final_pure_reads_1.fastq"),
         r2 = lambda wc: str(base / f"{config["output"]["qc"]["read_qc"]}/{wc.sample}/final_pure_reads_2.fastq"),

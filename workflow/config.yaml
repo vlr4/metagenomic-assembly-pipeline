@@ -14,7 +14,7 @@ input:
 
 # Reference genomes / databases
 reference:
-  human: "hg38.fa"
+  human: "human_genome/hg38.fa"
 gtdbtk:
   mash_db: "db/release226/mash_db"
 
