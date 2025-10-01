@@ -36,7 +36,7 @@ with open(config["samples"]) as f:
 ##### entry point #####
 rule all:
     input:
-        
+        str(base / "result/classify/bac120_infer_out/gtdbtk.bac120.classify.tree")
 #        str(base / "hybrid_temp/drep/hybrid/Cdb.csv")
 #        str(base / "result/metawrap_bins/hybrid/hybrid_genomeInfo.csv")
 #        expand("m/{sample}_binning/bin_reassembly/reassembly_results.png", sample=SAMPLES)
