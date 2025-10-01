@@ -1,4 +1,4 @@
-rule gtdbtk:
+rule classification:
     input:
         bins = str(base / "result/metawrap_bins/hybrid"),
         mashdb = config["gtdbtk"]["mash_db"]

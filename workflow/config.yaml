@@ -16,7 +16,7 @@ input:
 reference:
   human: "human_genome/hg38.fa"
 gtdbtk:
-  mash_db: "db/release226/mash_db"
+  mash_db: "db/release226/mash_db.msh"
 
 # Output directories
 output:
