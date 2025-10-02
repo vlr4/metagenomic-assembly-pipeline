@@ -34,10 +34,12 @@ rule classification:
           --out_dir {params.bac_out} \
           --cpu {threads}
 
-        gtdbtk infer \
-          --msa_file {params.classify_out}/align/hybrid.ar122.user_msa.fasta \
-          --out_dir {params.ar_out} \
-          --cpu {threads}
+        if [ -f {params.classify_out}/align/hybrid.ar122.user_msa.fasta ]; then
+            gtdbtk infer \
+              --msa_file {params.classify_out}/align/hybrid.ar122.user_msa.fasta \
+              --out_dir {params.ar_out} \
+              --cpu {threads}
+        fi
 
         gtdbtk de_novo_wf \
           --genome_dir {input.bins} \
