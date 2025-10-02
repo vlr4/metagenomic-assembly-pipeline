@@ -28,12 +28,12 @@ rule classification:
           --prefix hybrid
 
         gtdbtk infer \
-          --msa_file {params.classify_out}/hybrid.bac120.user_msa.fasta \
+          --msa_file {params.classify_out}/align/hybrid.bac120.user_msa.fasta \
           --out_dir {params.bac_out} \
           --cpu {threads}
 
         gtdbtk infer \
-          --msa_file {params.classify_out}/hybrid.ar122.user_msa.fasta \
+          --msa_file {params.classify_out}/align/hybrid.ar122.user_msa.fasta \
           --out_dir {params.ar_out} \
           --cpu {threads}
 
