@@ -26,7 +26,9 @@ rule classification:
           --cpus {threads} \
           -x fa \
           --prefix hybrid
-
+        
+        gunzip {params.classify_out}/align/hybrid.bac120.user_msa.fasta.gz
+        
         gtdbtk infer \
           --msa_file {params.classify_out}/align/hybrid.bac120.user_msa.fasta \
           --out_dir {params.bac_out} \
