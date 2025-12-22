@@ -1,52 +1,51 @@
-rule classification:
+checkpoint gtdbtk_classify:
     input:
         bins = str(base / "result/metawrap_bins/hybrid"),
         mashdb = config["gtdbtk"]["mash_db"]
     output:
-        classify_summary = str(base / "result/classify/hybrid.summary.tsv"),
-        bac_tree = str(base / "result/classify/bac120_infer_out/gtdbtk.bac120.classify.tree"),
-        ar_tree = str(base / "result/classify/ar122_infer_out/gtdbtk.ar122.classify.tree"),
-        denovo_tree = str(base / "result/de_novo_classify/de_novo.bac120.classify.tree")
+        summary = str(base / "result/classify/hybrid.summary.tsv")
     params:
-        classify_out = str(base / "result/classify"),
-        bac_out = str(base / "result/classify/bac120_infer_out"),
-        ar_out = str(base / "result/classify/ar122_infer_out"),
-        denovo_out = str(base / "result/de_novo_classify")
+        outdir = str(base / "result/classify")
     threads: 20
-    resources:
-        mem_mb = 100000
     shell:
         """
         source activate gtdbtk
-
         gtdbtk classify_wf \
           --genome_dir {input.bins} \
-          --out_dir {params.classify_out} \
+          --out_dir {params.outdir} \
           --mash_db {input.mashdb} \
           --cpus {threads} \
           -x fa \
           --prefix hybrid
-        
-        gunzip {params.classify_out}/align/hybrid.bac120.user_msa.fasta.gz
-        
-        gtdbtk infer \
-          --msa_file {params.classify_out}/align/hybrid.bac120.user_msa.fasta \
-          --out_dir {params.bac_out} \
-          --cpu {threads}
-
-        if [ -f {params.classify_out}/align/hybrid.ar122.user_msa.fasta ]; then
-            gtdbtk infer \
-              --msa_file {params.classify_out}/align/hybrid.ar122.user_msa.fasta \
-              --out_dir {params.ar_out} \
-              --cpu {threads}
-        fi
-
-        gtdbtk de_novo_wf \
-          --genome_dir {input.bins} \
-          --out_dir {params.denovo_out} \
-          --extension fa \
-          --bacteria \
-          --outgroup_taxon p__Patescibacteria \
-          --prefix de_novo \
-          --cpus {threads}
         """
+
+rule infer_bacteria:
+    input:
+        msa = str(base / "result/classify/align/hybrid.bac120.user_msa.fasta")
+    output:
+        tree = str(base / "result/classify/bac120_infer_out/gtdbtk.bac120.classify.tree")
+    threads: 20
+    shell:
+        """
+        source activate gtdbtk
+        gtdbtk infer \
+          --msa_file {input.msa} \
+          --out_dir {dirname(output.tree)} \
+          --cpu {threads}
+        """
+
+rule infer_archaea:
+    input:
+        msa = str(base / "result/classify/align/hybrid.ar122.user_msa.fasta")
+    output:
+        tree = str(base / "result/classify/ar122_infer_out/gtdbtk.ar122.classify.tree")
+    threads: 20
+    shell:
+        """
+        source activate gtdbtk
+        gtdbtk infer \
+          --msa_file {input.msa} \
+          --out_dir {dirname(output.tree)} \
+          --cpu {threads}
+        """
+

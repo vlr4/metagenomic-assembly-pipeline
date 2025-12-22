@@ -33,19 +33,29 @@ with open(config["samples"]) as f:
     next(f)  # skip header
     SAMPLES = [line.split()[0] for line in f if line.strip()]
 
+def ar122_tree(wc):
+    ck = checkpoints.gtdbtk_classify.get()
+    msa = base / "result/classify/align/hybrid.ar122.user_msa.fasta"
+    return (
+        base / "result/classify/ar122_infer_out/gtdbtk.ar122.classify.tree"
+        if os.path.exists(msa)
+        else []
+    )
+
 ##### entry point #####
 rule all:
     input:
-        str(base / "result/classify/bac120_infer_out/gtdbtk.bac120.classify.tree")
-#        str(base / "hybrid_temp/drep/hybrid/Cdb.csv")
-#        str(base / "result/metawrap_bins/hybrid/hybrid_genomeInfo.csv")
-#        expand("m/{sample}_binning/bin_reassembly/reassembly_results.png", sample=SAMPLES)
-#        expand("m/{sample}_binning/bin_refinement/metawrap_70_10_bins.stats", sample=SAMPLES)
-#        expand("m/{sample}_binning/concoct_bins/bin.1.fa"), sample=SAMPLES)
+        str(base / "result/classify/bac120_infer_out/gtdbtk.bac120.classify.tree"),
+        ar122_tree
+#        str(base / "hybrid_temp/drep/hybrid/Cdb.csv"),
+#        str(base / "result/metawrap_bins/hybrid/hybrid_genomeInfo.csv"),
+#        expand("m/{sample}_binning/bin_reassembly/reassembly_results.png", sample=SAMPLES),
+#        expand("m/{sample}_binning/bin_refinement/metawrap_70_10_bins.stats", sample=SAMPLES),
+#        expand("m/{sample}_binning/concoct_bins/bin.1.fa"), sample=SAMPLES),
 #        expand(str(base / config["output"]["assembly"]["binning"] / "{sample}_binning/metabat2_bins/bin.1.fa"), sample=SAMPLES),
-#        expand(str(base / config["output"]["assembly"]["binning"] / "{sample}_binning/maxbin2_bins/bin.1.fa"), sample=SAMPLES) 
-#        expand(str(base / config["output"]["assembly"]["spades"] / "{sample}_assembly" / "contigs.fasta"), sample=SAMPLES) 
-#        expand(str(base / config["output"]["qc"]["read_qc"] / "{sample}" / "final_pure_reads_1.fastq"), sample=SAMPLES)
+#        expand(str(base / config["output"]["assembly"]["binning"] / "{sample}_binning/maxbin2_bins/bin.1.fa"), sample=SAMPLES), 
+#        expand(str(base / config["output"]["assembly"]["spades"] / "{sample}_assembly" / "contigs.fasta"), sample=SAMPLES), 
+#        expand(str(base / config["output"]["qc"]["read_qc"] / "{sample}" / "final_pure_reads_1.fastq"), sample=SAMPLES),
 #        expand(str(base / config["output"]["dehost"]["sam"] / "nano.{sample}.dehost.fq.gz"), sample=SAMPLES)
 
 ##### load rules #####
