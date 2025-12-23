@@ -45,7 +45,7 @@ def ar122_tree(wc):
 ##### entry point #####
 rule all:
     input:
-        str(base / "result/classify/bac120_infer_out/gtdbtk.bac120.classify.tree"),
+        str(base / "result/classify/hybrid.bac120.summary.tsv"),
         ar122_tree
 #        str(base / "hybrid_temp/drep/hybrid/Cdb.csv"),
 #        str(base / "result/metawrap_bins/hybrid/hybrid_genomeInfo.csv"),
