@@ -1,20 +1,20 @@
 checkpoint gtdbtk_classify:
     input:
-        bins = str(base / "result/metawrap_bins/hybrid"),
-        mashdb = config["gtdbtk"]["mash_db"]
+        bins = str(base / "result/metawrap_bins/hybrid")
     output:
         summary = str(base / "result/classify/hybrid.bac120.summary.tsv")
     params:
-        outdir = str(base / "result/classify")
+        outdir = str(base / "result/classify"),
+        mashdb = config["gtdbtk"]["mash_db"]
     threads: 20
     shell:
         """
-        export GTDBTK_DATA_PATH={input.mashdb}
+        export GTDBTK_DATA_PATH={params.mashdb}
         source activate gtdbtk
         gtdbtk classify_wf \
           --genome_dir {input.bins} \
           --out_dir {params.outdir} \
-          --mash_db {input.mashdb} \
+          --mash_db {params.mashdb} \
           --cpus {threads} \
           -x fa \
           --prefix hybrid
