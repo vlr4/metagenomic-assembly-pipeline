@@ -9,6 +9,7 @@ checkpoint gtdbtk_classify:
     threads: 20
     shell:
         """
+        export GTDBTK_DATA_PATH={input.mashdb}
         source activate gtdbtk
         gtdbtk classify_wf \
           --genome_dir {input.bins} \
