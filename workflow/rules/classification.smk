@@ -1,13 +1,13 @@
 checkpoint gtdbtk_classify:
     input:
         bins = str(base / "result/metawrap_bins/hybrid"),
-        mashdb = config["gtdbtk"]["mash_db"]
+        mashdb = config["gtdbtk"]["mash_db"],
         msa = str(base / "result/classify/align/hybrid.bac120.user_msa.fasta")
     output:
-        summary = str(base / "result/classify/hybrid.bac120.summary.tsv")
+        summary = str(base / "result/classify/hybrid.bac120.summary.tsv"),
         tree = str(base / "result/classify/bac120_infer_out/gtdbtk.unrooted.tree")
     params:
-        outdir = str(base / "result/classify")
+        outdir = str(base / "result/classify"),
         outdir_bac = str(base / "result/classify/bac120_infer_out")
     threads: 20
     shell:
