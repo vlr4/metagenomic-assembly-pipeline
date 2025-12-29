@@ -49,9 +49,8 @@ def ar122_tree(wc):
 rule all:
     input:
         str(base / "result/classify/hybrid.bac120.summary.tsv"),
-        bac120_tree
-        ar122_tree,
-        
+        bac120_tree,
+        ar122_tree        
 
 #        str(base / "hybrid_temp/drep/hybrid/Cdb.csv"),
 #        str(base / "result/metawrap_bins/hybrid/hybrid_genomeInfo.csv"),
