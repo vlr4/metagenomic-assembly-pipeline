@@ -6,6 +6,7 @@ checkpoint gtdbtk_classify:
     params:
         outdir = str(base / "result/classify"),
         mashdb = config["gtdbtk"]["mash_db"]
+        msa_dir = str(base / "result/classify/align/")
     threads: 20
     shell:
         """
@@ -18,6 +19,7 @@ checkpoint gtdbtk_classify:
           --cpus {threads} \
           -x fa \
           --prefix hybrid
+        gzip -d {params.msa_dir}*.gz
         """
 
 rule infer_bacteria:
