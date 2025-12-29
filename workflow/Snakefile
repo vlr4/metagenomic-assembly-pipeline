@@ -33,20 +33,26 @@ with open(config["samples"]) as f:
     next(f)  # skip header
     SAMPLES = [line.split()[0] for line in f if line.strip()]
 
+def bac120_tree(wc):
+    checkpoints.gtdbtk_classify.get()
+    msa = base / "result/classify/align/hybrid.bac120.user_msa.fasta"
+    out = base / "result/classify/bac120_infer_out/gtdbtk.unrooted.tree"
+    return out if os.path.exists(msa) else []
+
 def ar122_tree(wc):
-    ck = checkpoints.gtdbtk_classify.get()
+    checkpoints.gtdbtk_classify.get()
     msa = base / "result/classify/align/hybrid.ar122.user_msa.fasta"
-    return (
-        base / "result/classify/ar122_infer_out/gtdbtk.ar122.classify.tree"
-        if os.path.exists(msa)
-        else []
-    )
+    out = base / "result/classify/ar122_infer_out/gtdbtk.unrooted.tree"
+    return out if os.path.exists(msa) else []
 
 ##### entry point #####
 rule all:
     input:
         str(base / "result/classify/hybrid.bac120.summary.tsv"),
-        ar122_tree
+        bac120_tree
+        ar122_tree,
+        
+
 #        str(base / "hybrid_temp/drep/hybrid/Cdb.csv"),
 #        str(base / "result/metawrap_bins/hybrid/hybrid_genomeInfo.csv"),
 #        expand("m/{sample}_binning/bin_reassembly/reassembly_results.png", sample=SAMPLES),
