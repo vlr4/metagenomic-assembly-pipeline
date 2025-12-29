@@ -5,7 +5,7 @@ checkpoint gtdbtk_classify:
         summary = str(base / "result/classify/hybrid.bac120.summary.tsv")
     params:
         outdir = str(base / "result/classify"),
-        mashdb = config["gtdbtk"]["mash_db"]
+        mashdb = config["gtdbtk"]["mash_db"],
         msa_dir = str(base / "result/classify/align/")
     threads: 20
     shell:
