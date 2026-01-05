@@ -4,7 +4,7 @@ rule denovo_classify:
     output:
         log = str(base / "result/classify/de_novo_classify/gtdbtk.log")
     params:
-        outdir = str(base / "result/classify/de_novo_classify")
+        outdir = str(base / "result/classify/de_novo_classify"),
         outgroup = "p__Patescibacteria"
     threads: 20
     shell:
