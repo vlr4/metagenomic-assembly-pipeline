@@ -48,10 +48,10 @@ def ar122_tree(wc):
 ##### entry point #####
 rule all:
     input:
-        str(base / "result/classify/hybrid.bac120.summary.tsv"),
-        bac120_tree,
-        ar122_tree        
-
+        (str(base / "result/classify/de_novo_classify/gtdbtk.log"))
+#        str(base / "result/classify/hybrid.bac120.summary.tsv"),
+#        bac120_tree,
+#        ar122_tree        
 #        str(base / "hybrid_temp/drep/hybrid/Cdb.csv"),
 #        str(base / "result/metawrap_bins/hybrid/hybrid_genomeInfo.csv"),
 #        expand("m/{sample}_binning/bin_reassembly/reassembly_results.png", sample=SAMPLES),
@@ -72,4 +72,5 @@ rule all:
 #include: "rules/reassembly.smk"
 #include: "rules/summarize_bins.smk"
 #include: "rules/dereplication.smk"
-include: "rules/classification.smk"
+#include: "rules/classification.smk"
+include: "rules/denovo_classification.smk"
