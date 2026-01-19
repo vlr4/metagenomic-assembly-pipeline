@@ -4,7 +4,7 @@ rule binning:
         r1 = lambda wc: str(base / f"{config['output']['qc']['read_qc']}/{wc.sample}/final_pure_reads_1.fastq"),
         r2 = lambda wc: str(base / f"{config['output']['qc']['read_qc']}/{wc.sample}/final_pure_reads_2.fastq")
     output:
-        concoct_bin = str(base / f"{config['output']['assembly']['binning']}/{{sample}}_binning/concoct_bins/bin.1.fa")
+        concoct_bin = str(base / f"{config['output']['assembly']['binning']}/{{sample}}_binning/concoct_bins/bin.1.fa"),
         metabat2 = str(base / f"{config['output']['assembly']['binning']}/{{sample}}_binning/metabat2_bins/bin.1.fa"),
         maxbin2 = str(base / f"{config['output']['assembly']['binning']}/{{sample}}_binning/maxbin2_bins/bin.1.fa")
     params: 
