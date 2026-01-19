@@ -19,7 +19,8 @@ rule nano_dehost:
         minimap2 {params.minimap2_options} -t {threads} {input.ref} {input.fastq} > {output.sam}
         awk "($2==4) {{print $1}}" {output.sam} > {output.unmapped}
         cp {output.unmapped} {output.copied}
-        seqkit grep -f {output.unmapped} {input.fastq} > tmp.{wildcards.sample}.fq
-        gzip -c tmp.{wildcards.sample}.fq > {output.dehosted}
-        rm tmp.{wildcards.sample}.fq
+        tmp=$(mktemp tmp.{wildcards.sample}.XXXX.fq)
+        seqkit grep -f {output.unmapped} {input.fastq} > "$tmp"
+        gzip -c "$tmp" > {output.dehosted}
+        rm -f "$tmp"
         """

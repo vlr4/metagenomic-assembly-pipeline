@@ -1,5 +1,5 @@
 # Main working (data) directory
-data_dir: "/mnt/shared/scratch/vtelizhe/metagenomic_networks/01test"
+data_dir: "/mnt/shared/scratch/vtelizhe/metagenomic_networks/new"
 
 # Sample design file
 samples: "sample_design.txt"
@@ -15,8 +15,6 @@ input:
 # Reference genomes / databases
 reference:
   human: "human_genome/hg38.fa"
-gtdbtk:
-  mash_db: "db/release226/mash_db.msh"
 
 # Output directories
 output:
@@ -29,8 +27,6 @@ output:
     spades: "hybrid_temp/spades"
     binning: "hybrid_temp/binning"
      
-
-
 # Resources
 threads:
   dehost: 20

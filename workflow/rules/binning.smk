@@ -4,9 +4,9 @@ rule binning:
         r1 = lambda wc: str(base / f"{config['output']['qc']['read_qc']}/{wc.sample}/final_pure_reads_1.fastq"),
         r2 = lambda wc: str(base / f"{config['output']['qc']['read_qc']}/{wc.sample}/final_pure_reads_2.fastq")
     output:
-        concoct_dir = str(base / f"{config['output']['assembly']['binning']}/{{sample}}_binning/concoct_bins/bin.1.fa")
-#        metabat2 = str(base / f"{config['output']['assembly']['binning']}/{{sample}}_binning/metabat2_bins/bin.1.fa"),
-#        maxbin2 = str(base / f"{config['output']['assembly']['binning']}/{{sample}}_binning/maxbin2_bins/bin.1.fa")
+        concoct_bin = str(base / f"{config['output']['assembly']['binning']}/{{sample}}_binning/concoct_bins/bin.1.fa")
+        metabat2 = str(base / f"{config['output']['assembly']['binning']}/{{sample}}_binning/metabat2_bins/bin.1.fa"),
+        maxbin2 = str(base / f"{config['output']['assembly']['binning']}/{{sample}}_binning/maxbin2_bins/bin.1.fa")
     params: 
         bin_dir = str(base / config['output']['assembly']['binning']),
         sample_dir = str(base / f"{config['output']['assembly']['binning']}/{{sample}}_binning")
@@ -14,13 +14,13 @@ rule binning:
 #    conda: "../envs/metawrap.yaml"
     shell:
         """
-        source activate concoct-env
+        source activate metawrap-env
         export OPENBLAS_NUM_THREADS=1
         mkdir -p {params.bin_dir}
         metawrap binning \
           -o {params.sample_dir} \
           -t {threads} \
           -a {input.assembly} \
-          --concoct \
+          --concoct --metabat2 --maxbin2 \
           {input.r1} {input.r2}
         """

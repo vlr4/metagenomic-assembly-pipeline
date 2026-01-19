@@ -15,7 +15,6 @@ for k in ("long_reads", "short_reads", "read_qc", "dehost"):
     config["input"][k] = str(base / config["input"][k])
 
 config["reference"]["human"] = str(Path(config["input"]["databases"]) / config["reference"]["human"])
-config["gtdbtk"]["mash_db"] = str(Path(config["input"]["databases"]) / config["gtdbtk"]["mash_db"])
 
 ##### Create symlink on startup to dodge CheckM error #####
 symlink_path = "m"
@@ -24,7 +23,10 @@ if not os.path.exists(symlink_path):
     os.symlink(target_path, symlink_path)
 elif not os.path.islink(symlink_path):
     import shutil
-    shutil.rmtree(symlink_path)
+    if os.path.isdir(symlink_path):
+        shutil.rmtree(symlink_path)
+    else:
+        os.remove(symlink_path)
     os.symlink(target_path, symlink_path)
 
 
@@ -33,32 +35,16 @@ with open(config["samples"]) as f:
     next(f)  # skip header
     SAMPLES = [line.split()[0] for line in f if line.strip()]
 
-def bac120_tree(wc):
-    checkpoints.gtdbtk_classify.get()
-    msa = base / "result/classify/align/hybrid.bac120.user_msa.fasta"
-    out = base / "result/classify/bac120_infer_out/gtdbtk.unrooted.tree"
-    return out if os.path.exists(msa) else []
-
-def ar122_tree(wc):
-    checkpoints.gtdbtk_classify.get()
-    msa = base / "result/classify/align/hybrid.ar122.user_msa.fasta"
-    out = base / "result/classify/ar122_infer_out/gtdbtk.unrooted.tree"
-    return out if os.path.exists(msa) else []
-
 ##### entry point #####
 rule all:
-    input:
-        (str(base / "result/classify/de_novo_classify/gtdbtk.log"))
-#        str(base / "result/classify/hybrid.bac120.summary.tsv"),
-#        bac120_tree,
-#        ar122_tree        
+    input:     
 #        str(base / "hybrid_temp/drep/hybrid/Cdb.csv"),
 #        str(base / "result/metawrap_bins/hybrid/hybrid_genomeInfo.csv"),
 #        expand("m/{sample}_binning/bin_reassembly/reassembly_results.png", sample=SAMPLES),
 #        expand("m/{sample}_binning/bin_refinement/metawrap_70_10_bins.stats", sample=SAMPLES),
-#        expand("m/{sample}_binning/concoct_bins/bin.1.fa"), sample=SAMPLES),
-#        expand(str(base / config["output"]["assembly"]["binning"] / "{sample}_binning/metabat2_bins/bin.1.fa"), sample=SAMPLES),
-#        expand(str(base / config["output"]["assembly"]["binning"] / "{sample}_binning/maxbin2_bins/bin.1.fa"), sample=SAMPLES), 
+        expand("m/{sample}_binning/concoct_bins/bin.1.fa", sample=SAMPLES),
+        expand(str(base / config["output"]["assembly"]["binning"] / "{sample}_binning/metabat2_bins/bin.1.fa"), sample=SAMPLES),
+        expand(str(base / config["output"]["assembly"]["binning"] / "{sample}_binning/maxbin2_bins/bin.1.fa"), sample=SAMPLES), 
 #        expand(str(base / config["output"]["assembly"]["spades"] / "{sample}_assembly" / "contigs.fasta"), sample=SAMPLES), 
 #        expand(str(base / config["output"]["qc"]["read_qc"] / "{sample}" / "final_pure_reads_1.fastq"), sample=SAMPLES),
 #        expand(str(base / config["output"]["dehost"]["sam"] / "nano.{sample}.dehost.fq.gz"), sample=SAMPLES)
@@ -67,10 +53,8 @@ rule all:
 #include: "rules/nano_dehost.smk"
 #include: "rules/read_qc.smk"
 #include: "rules/assembly.smk"
-#include: "rules/binning.smk"
+include: "rules/binning.smk"
 #include: "rules/bin_refinement.smk"
 #include: "rules/reassembly.smk"
 #include: "rules/summarize_bins.smk"
 #include: "rules/dereplication.smk"
-#include: "rules/classification.smk"
-include: "rules/denovo_classification.smk"
