@@ -19,14 +19,17 @@ config["reference"]["human"] = str(Path(config["input"]["databases"]) / config["
 ##### Create symlink on startup to dodge CheckM error #####
 symlink_path = "m"
 target_path = str(base / "hybrid_temp/binning")
-if not os.path.exists(symlink_path):
-    os.symlink(target_path, symlink_path)
-elif not os.path.islink(symlink_path):
-    import shutil
+if os.path.islink(symlink_path):
+    if os.readlink(symlink_path) != target_path:
+        os.unlink(symlink_path)
+        os.symlink(target_path, symlink_path)
+elif os.path.exists(symlink_path):
     if os.path.isdir(symlink_path):
         shutil.rmtree(symlink_path)
     else:
         os.remove(symlink_path)
+    os.symlink(target_path, symlink_path)
+else:
     os.symlink(target_path, symlink_path)
 
 
