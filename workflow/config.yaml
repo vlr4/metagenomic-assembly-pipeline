@@ -1,5 +1,5 @@
 # Main working (data) directory
-data_dir: "/mnt/shared/scratch/vtelizhe/metagenomic_networks/new"
+data_dir: "/mnt/shared/scratch/vtelizhe/metagenomic_networks/01test"
 
 # Sample design file
 samples: "sample_design.txt"
