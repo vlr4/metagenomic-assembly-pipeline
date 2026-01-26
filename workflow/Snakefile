@@ -20,7 +20,8 @@ INPUT = {
 
 DB = Path(config["input"]["databases"])
 REFERENCE_HUMAN = DB / config["reference"]["human"]
-INDEX_DIR = DB / "bmtagger_index"
+HG = Path(config["reference"]["human"]).stem
+
 
 ##### samples #####
 with open(SAMPLES_FILE) as f:
@@ -58,6 +59,7 @@ rule all:
         expand(SYMLINK / "{sample}_binning/maxbin2_bins/bin.1.fa", sample=SAMPLES),
         expand(BASE / config["output"]["assembly"]["spades"] / "{sample}_assembly/contigs.fasta", sample=SAMPLES),
         expand(BASE / config["output"]["qc"]["read_qc"] / "{sample}/final_pure_reads_1.fastq", sample=SAMPLES),
+        DB / "{HG}.bitmask",
         expand(BASE / config["output"]["dehost"]["sam"] / "nano.{sample}.dehost.fq.gz", sample=SAMPLES)
         
 
@@ -70,4 +72,5 @@ include: "rules/binning.smk"
 include: "rules/bin_refinement.smk"
 include: "rules/reassembly.smk"
 include: "rules/summarize_bins.smk"
+include: "rules/index.smk"
 include: "rules/dereplication.smk"
