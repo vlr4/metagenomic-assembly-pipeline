@@ -3,7 +3,7 @@ rule bmtagger_index:
         fasta = REFERENCE_HUMAN
     output:
         bitmask = INDEX_DIR / f"{REFERENCE_HUMAN.name}.bitmask",
-        srprism = INDEX_DIR / f"{REFERENCE_HUMAN.name}.srprism",
+        srprism_idx = INDEX_DIR / f"{REFERENCE_HUMAN.name}.srprism.idx"
     threads: 1
     resources:
         mem_mb = 32000
