@@ -8,7 +8,7 @@ min_version("8.8.0")
 
 configfile: "config.yaml"
 
-##### resolve paths (do NOT mutate config) #####
+##### resolve paths #####
 BASE = Path(config["data_dir"])
 
 SAMPLES_FILE = BASE / config["samples"]
@@ -18,7 +18,8 @@ INPUT = {
     for k in ("long_reads", "short_reads", "read_qc", "dehost")
 }
 
-REFERENCE_HUMAN = INPUT["databases"] / config["reference"]["human"]
+DB = Path(config["input"]["databases"])  
+REFERENCE_HUMAN = DB / config["reference"]["human"]
 
 ##### samples #####
 with open(SAMPLES_FILE) as f:
@@ -29,7 +30,7 @@ with open(SAMPLES_FILE) as f:
         if l.strip()
     ]
 
-##### symlink handling (DAG-safe) #####
+##### symlink handling #####
 SYMLINK = Path("m")
 TARGET = BASE / "hybrid_temp/binning"
 
