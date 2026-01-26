@@ -1,7 +1,7 @@
 rule nano_dehost:
     input:
-        fastq = config["input"]["long_reads"] + "/{sample}.fastq",
-        ref = config["reference"]["human"]
+        fastq = INPUT["long_reads"] + "/{sample}.fastq",
+        ref = REFERENCE_HUMAN
     output:
         sam = BASE / config["output"]["dehost"]["sam"] / "{sample}.sam",
         unmapped = BASE / config["output"]["dehost"]["sam"] / "{sample}.unmapped.names",
