@@ -1,63 +1,72 @@
 from snakemake.utils import min_version
 from pathlib import Path
+import shutil
 import os
 
-##### set minimum snakemake version #####
+##### minimum snakemake version #####
 min_version("8.8.0")
 
 configfile: "config.yaml"
 
-##### resolve global paths from data_dir for input and databases #####
-base = Path(config["data_dir"])
+##### resolve paths (do NOT mutate config) #####
+BASE = Path(config["data_dir"])
 
-config["samples"] = str(base / config["samples"])
-for k in ("long_reads", "short_reads", "read_qc", "dehost"):
-    config["input"][k] = str(base / config["input"][k])
+SAMPLES_FILE = BASE / config["samples"]
 
-config["reference"]["human"] = str(Path(config["input"]["databases"]) / config["reference"]["human"])
+INPUT = {
+    k: BASE / config["input"][k]
+    for k in ("long_reads", "short_reads", "read_qc", "dehost")
+}
 
-##### Create symlink on startup to dodge CheckM error #####
-symlink_path = "m"
-target_path = str(base / "hybrid_temp/binning")
-if os.path.islink(symlink_path):
-    if os.readlink(symlink_path) != target_path:
-        os.unlink(symlink_path)
-        os.symlink(target_path, symlink_path)
-elif os.path.exists(symlink_path):
-    if os.path.isdir(symlink_path):
-        shutil.rmtree(symlink_path)
-    else:
-        os.remove(symlink_path)
-    os.symlink(target_path, symlink_path)
-else:
-    os.symlink(target_path, symlink_path)
-
+REFERENCE_HUMAN = INPUT["databases"] / config["reference"]["human"]
 
 ##### samples #####
-with open(config["samples"]) as f:
-    next(f)  # skip header
-    SAMPLES = [line.split()[0] for line in f if line.strip()]
+with open(SAMPLES_FILE) as f:
+    next(f)
+    SAMPLES = [
+        l.split()[0]
+        for l in f
+        if l.strip()
+    ]
+
+##### symlink handling (DAG-safe) #####
+SYMLINK = Path("m")
+TARGET = BASE / "hybrid_temp/binning"
+
+rule init_symlink:
+    output:
+        SYMLINK
+    run:
+        if SYMLINK.exists() or SYMLINK.is_symlink():
+            if SYMLINK.is_symlink() and SYMLINK.resolve() == TARGET.resolve():
+                return
+            if SYMLINK.is_dir() and not SYMLINK.is_symlink():
+                shutil.rmtree(SYMLINK)
+            else:
+                SYMLINK.unlink()
+        os.symlink(TARGET, SYMLINK)
 
 ##### entry point #####
 rule all:
-    input:     
-#        str(base / "hybrid_temp/drep/hybrid/Cdb.csv"),
-#        str(base / "result/metawrap_bins/hybrid/hybrid_genomeInfo.csv"),
-#        expand("m/{sample}_binning/bin_reassembly/reassembly_results.png", sample=SAMPLES),
-#        expand("m/{sample}_binning/bin_refinement/metawrap_70_10_bins.stats", sample=SAMPLES),
-        expand(str(base / config['output']['assembly']['binning'] / "{sample}_binning/concoct_bins/bin.1.fa"), sample=SAMPLES),
-        expand(str(base / config["output"]["assembly"]["binning"] / "{sample}_binning/metabat2_bins/bin.1.fa"), sample=SAMPLES),
-        expand(str(base / config["output"]["assembly"]["binning"] / "{sample}_binning/maxbin2_bins/bin.1.fa"), sample=SAMPLES) 
-#        expand(str(base / config["output"]["assembly"]["spades"] / "{sample}_assembly" / "contigs.fasta"), sample=SAMPLES), 
-#        expand(str(base / config["output"]["qc"]["read_qc"] / "{sample}" / "final_pure_reads_1.fastq"), sample=SAMPLES),
-#        expand(str(base / config["output"]["dehost"]["sam"] / "nano.{sample}.dehost.fq.gz"), sample=SAMPLES)
+    input:
+        SYMLINK,
+        BASE / "hybrid_temp/drep/hybrid/Cdb.csv",
+        BASE / "result/metawrap_bins/hybrid/hybrid_genomeInfo.csv",
+        expand("m/{sample}_binning/bin_reassembly/reassembly_results.png", sample=SAMPLES),
+        expand("m/{sample}_binning/bin_refinement/metawrap_70_10_bins.stats", sample=SAMPLES),
+        expand(BASE / config["output"]["assembly"]["binning"] / "{sample}_binning/concoct_bins/bin.1.fa", sample=SAMPLES),
+        expand(BASE / config["output"]["assembly"]["binning"] / "{sample}_binning/metabat2_bins/bin.1.fa", sample=SAMPLES),
+        expand(BASE / config["output"]["assembly"]["binning"] / "{sample}_binning/maxbin2_bins/bin.1.fa", sample=SAMPLES),
+        expand(BASE / config["output"]["assembly"]["spades"] / "{sample}_assembly/contigs.fasta", sample=SAMPLES),
+        expand(BASE / config["output"]["qc"]["read_qc"] / "{sample}/final_pure_reads_1.fastq", sample=SAMPLES),
+        expand(BASE / config["output"]["dehost"]["sam"] / "nano.{sample}.dehost.fq.gz", sample=SAMPLES)
 
 ##### load rules #####
-#include: "rules/nano_dehost.smk"
-#include: "rules/read_qc.smk"
-#include: "rules/assembly.smk"
+include: "rules/nano_dehost.smk"
+include: "rules/read_qc.smk"
+include: "rules/assembly.smk"
 include: "rules/binning.smk"
-#include: "rules/bin_refinement.smk"
-#include: "rules/reassembly.smk"
-#include: "rules/summarize_bins.smk"
-#include: "rules/dereplication.smk"
+include: "rules/bin_refinement.smk"
+include: "rules/reassembly.smk"
+include: "rules/summarize_bins.smk"
+include: "rules/dereplication.smk"

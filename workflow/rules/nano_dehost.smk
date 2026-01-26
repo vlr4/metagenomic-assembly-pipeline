@@ -1,17 +1,18 @@
 rule nano_dehost:
     input:
-        fastq = lambda wildcards: f"{config['input']['long_reads']}/{wildcards.sample}.fastq",
+        fastq = config["input"]["long_reads"] + "/{sample}.fastq",
         ref = config["reference"]["human"]
     output:
-        sam = str(base / f"{config['output']['dehost']['sam']}/{{sample}}.sam"),
-        unmapped = str(base / f"{config['output']['dehost']['sam']}/{{sample}}.unmapped.names"),
-        copied = str(base / f"{config['output']['dehost']['result']}/{{sample}}.unmapped.names"),
-        dehosted = str(base / f"{config['output']['dehost']['sam']}/nano.{{sample}}.dehost.fq.gz")
+        sam = BASE / config["output"]["dehost"]["sam"] / "{sample}.sam",
+        unmapped = BASE / config["output"]["dehost"]["sam"] / "{sample}.unmapped.names",
+        copied = BASE / config["output"]["dehost"]["result"] / "{sample}.unmapped.names",
+        dehosted = BASE / config["output"]["dehost"]["sam"] / "nano.{sample}.dehost.fq.gz"
     params:
-        sam_dir = str(base / config["output"]["dehost"]["sam"]),
-        result_dir = str(base / config["output"]["dehost"]["result"]),
+        sam_dir = BASE / config["output"]["dehost"]["sam"],
+        result_dir = BASE / config["output"]["dehost"]["result"],
         minimap2_options = config["minimap2"]["options"]
-    threads: config["threads"]["dehost"]
+    threads:
+        config["threads"]["dehost"]
     shell:
         """
         source activate nanosoft

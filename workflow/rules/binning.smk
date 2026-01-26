@@ -1,16 +1,16 @@
 rule binning:
     input:
-        assembly = lambda wc: str(base / f"{config['output']['assembly']['spades']}/{wc.sample}_assembly/contigs.fasta"),
-        r1 = lambda wc: str(base / f"{config['output']['qc']['read_qc']}/{wc.sample}/final_pure_reads_1.fastq"),
-        r2 = lambda wc: str(base / f"{config['output']['qc']['read_qc']}/{wc.sample}/final_pure_reads_2.fastq")
+        assembly = BASE / config["output"]["assembly"]["spades"] / "{sample}_assembly/contigs.fasta",
+        r1 = BASE / config["output"]["qc"]["read_qc"] / "{sample}/final_pure_reads_1.fastq",
+        r2 = BASE / config["output"]["qc"]["read_qc"] / "{sample}/final_pure_reads_2.fastq"
     output:
-        concoct_bin = str(base / f"{config['output']['assembly']['binning']}/{{sample}}_binning/concoct_bins/bin.1.fa"),
-        metabat2 = str(base / f"{config['output']['assembly']['binning']}/{{sample}}_binning/metabat2_bins/bin.1.fa"),
-        maxbin2 = str(base / f"{config['output']['assembly']['binning']}/{{sample}}_binning/maxbin2_bins/bin.1.fa")
-    params: 
-        sample_dir = str(base / f"{config['output']['assembly']['binning']}/{{sample}}_binning")
-    threads: config["threads"]["binning"]
-#    conda: "../envs/metawrap.yaml"
+        concoct = BASE / config["output"]["assembly"]["binning"] / "{sample}_binning/concoct_bins/bin.1.fa",
+        metabat2 = BASE / config["output"]["assembly"]["binning"] / "{sample}_binning/metabat2_bins/bin.1.fa",
+        maxbin2 = BASE / config["output"]["assembly"]["binning"] / "{sample}_binning/maxbin2_bins/bin.1.fa"
+    params:
+        sample_dir = BASE / config["output"]["assembly"]["binning"] / "{sample}_binning"
+    threads:
+        config["threads"]["binning"]
     shell:
         """
         source activate metawrap-env

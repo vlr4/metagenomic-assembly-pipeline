@@ -1,16 +1,16 @@
 rule assembly:
     input:
-        r1 = lambda wc: str(base / f"{config['output']['qc']['read_qc']}/{wc.sample}/final_pure_reads_1.fastq"),
-        r2 = lambda wc: str(base / f"{config['output']['qc']['read_qc']}/{wc.sample}/final_pure_reads_2.fastq"),
-        nano = lambda wc: str(base / f"{config['output']['dehost']['sam']}/nano.{wc.sample}.dehost.fq.gz")
+        r1 = BASE / config["output"]["qc"]["read_qc"] / "{sample}/final_pure_reads_1.fastq",
+        r2 = BASE / config["output"]["qc"]["read_qc"] / "{sample}/final_pure_reads_2.fastq",
+        nano = BASE / config["output"]["dehost"]["sam"] / "nano.{sample}.dehost.fq.gz"
     output:
-        spades_contigs = str(base / f"{config['output']['assembly']['spades']}/{{sample}}_assembly/contigs.fasta") 
+        spades_contigs = BASE / config["output"]["assembly"]["spades"] / "{sample}_assembly/contigs.fasta"
     params:
-        spades_dir = str(base /  f"{config['output']['assembly']['spades']}/{{sample}}_assembly"),
+        spades_dir = BASE / config["output"]["assembly"]["spades"] / "{sample}_assembly",
         spades_opts = config["spades"]["options"],
         spades_mem = config["spades"]["memory"]
-    threads: config["threads"]["spades"]
-#    conda: "../envs/spades.yaml"
+    threads:
+        config["threads"]["spades"]
     shell:
         """
         source activate metawrap-env
