@@ -1,9 +1,7 @@
 rule read_qc:
     input:
         r1 = INPUT["short_reads"] / "{sample}_1.fastq",
-        r2 = INPUT["short_reads"] / "{sample}_2.fastq",
-        bitmask = INDEX_DIR / f"{REFERENCE_HUMAN.name}.bitmask",
-        srprism = INDEX_DIR / f"{REFERENCE_HUMAN.name}.srprism.idx"
+        r2 = INPUT["short_reads"] / "{sample}_2.fastq"
     output:
         pure_r1 = BASE / config["output"]["qc"]["read_qc"] / "{sample}/final_pure_reads_1.fastq",
         pure_r2 = BASE / config["output"]["qc"]["read_qc"] / "{sample}/final_pure_reads_2.fastq",
