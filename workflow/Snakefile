@@ -28,7 +28,7 @@ with open(SAMPLES_FILE) as f:
 
 ##### Create symlink on startup to dodge CheckM error #####
 SYMLINK = Path("m")
-TARGET = BASE / "hybrid_temp/binning"
+TARGET = BASE / config['output']['assembly']['binning']
 
 TARGET.mkdir(parents=True, exist_ok=True)
 
@@ -50,11 +50,11 @@ rule all:
     input:
         BASE / "hybrid_temp/drep/hybrid/Cdb.csv",
         BASE / "result/metawrap_bins/hybrid/hybrid_genomeInfo.csv",
-        expand("m/{sample}_binning/bin_reassembly/reassembly_results.png", sample=SAMPLES),
-        expand("m/{sample}_binning/bin_refinement/metawrap_70_10_bins.stats", sample=SAMPLES),
-        expand(BASE / config["output"]["assembly"]["binning"] / "{sample}_binning/concoct_bins/bin.1.fa", sample=SAMPLES),
-        expand(BASE / config["output"]["assembly"]["binning"] / "{sample}_binning/metabat2_bins/bin.1.fa", sample=SAMPLES),
-        expand(BASE / config["output"]["assembly"]["binning"] / "{sample}_binning/maxbin2_bins/bin.1.fa", sample=SAMPLES),
+        expand(SYMLINK / "{sample}_binning/bin_reassembly/reassembly_results.png", sample=SAMPLES),
+        expand(SYMLINK / "{sample}_binning/bin_refinement/metawrap_70_10_bins.stats", sample=SAMPLES),
+        expand(SYMLINK / "{sample}_binning/concoct_bins/bin.1.fa", sample=SAMPLES),
+        expand(SYMLINK / "{sample}_binning/metabat2_bins/bin.1.fa", sample=SAMPLES),
+        expand(SYMLINK / "{sample}_binning/maxbin2_bins/bin.1.fa", sample=SAMPLES),
         expand(BASE / config["output"]["assembly"]["spades"] / "{sample}_assembly/contigs.fasta", sample=SAMPLES),
         expand(BASE / config["output"]["qc"]["read_qc"] / "{sample}/final_pure_reads_1.fastq", sample=SAMPLES),
         expand(BASE / config["output"]["dehost"]["sam"] / "nano.{sample}.dehost.fq.gz", sample=SAMPLES)
