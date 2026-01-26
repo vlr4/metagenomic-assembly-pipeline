@@ -65,7 +65,7 @@ rule all:
 ##### load rules #####
 
 include: "rules/nano_dehost.smk"
-include: "rules/bmtagger_index.smk"
+include: "rules/index.smk"
 include: "rules/read_qc.smk"
 include: "rules/assembly.smk"
 include: "rules/binning.smk"
