@@ -4,7 +4,7 @@ rule bin_refinement:
         maxbin2 = SYMLINK / "{sample}_binning" / "maxbin2_bins",
         concoct = SYMLINK / "{sample}_binning" / "concoct_bins"
     output:
-        stats = SYMLINK / "{sample}_binning" / "bin_refinement" / "metawrap_70_10_bins.stats"
+        stats = SYMLINK / "{sample}_binning" / "bin_refinement" / "metawrap_70_10_bins.stats",
         bins  = directory(SYMLINK / "{sample}_binning" / "bin_refinement" / "metawrap_70_10_bins")
     params:
         out_dir = SYMLINK / "{sample}_binning/bin_refinement"
