@@ -1,10 +1,11 @@
 rule bin_refinement:
     input:
-        metabat2 = lambda wc: f"m/{wc.sample}_binning/metabat2_bins",
-        maxbin2 = lambda wc: f"m/{wc.sample}_binning/maxbin2_bins",
-        concoct = lambda wc: f"m/{wc.sample}_binning/concoct_bins"
+        metabat2 = SYMLINK / "{sample}_binning" / "metabat2_bins",
+        maxbin2 = SYMLINK / "{sample}_binning" / "maxbin2_bins",
+        concoct = SYMLINK / "{sample}_binning" / "concoct_bins"
     output:
         stats = SYMLINK / "{sample}_binning" / "bin_refinement" / "metawrap_70_10_bins.stats"
+        bins  = directory(SYMLINK / "{sample}_binning" / "bin_refinement" / "metawrap_70_10_bins")
     params:
         out_dir = SYMLINK / "{sample}_binning/bin_refinement"
     threads: config["threads"]["refinement"]

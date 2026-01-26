@@ -1,8 +1,8 @@
 rule reassembly:
     input:
-        r1 = lambda wc: str(BASE / f"{config["output"]["qc"]["read_qc"]}/{wc.sample}/final_pure_reads_1.fastq"),
-        r2 = lambda wc: str(BASE / f"{config["output"]["qc"]["read_qc"]}/{wc.sample}/final_pure_reads_2.fastq"),
-        refined = lambda wc: f"m/{wc.sample}_binning/bin_refinement/metawrap_70_10_bins"   
+        r1 = BASE / config["output"]["qc"]["read_qc"] / "{sample}" / "final_pure_reads_1.fastq",
+        r2 = BASE / config["output"]["qc"]["read_qc"] / "{sample}" / "final_pure_reads_2.fastq",
+        refined = SYMLINK / "{sample}_binning" / "bin_refinement" / "metawrap_70_10_bins"   
     output:
         stats = SYMLINK / "{sample}_binning" / "bin_reassembly" / "reassembled_bins.stats",
         plot = SYMLINK / "{sample}_binning" / "bin_reassembly" / "reassembly_results.png"
