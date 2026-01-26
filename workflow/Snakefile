@@ -26,30 +26,28 @@ with open(SAMPLES_FILE) as f:
     next(f)
     SAMPLES = [l.split()[0] for l in f if l.strip()]
 
-##### symlink handling (MUST be local) #####
+##### Create symlink on startup to dodge CheckM error #####
 SYMLINK = Path("m")
 TARGET = BASE / "hybrid_temp/binning"
 
-localrules: init_symlink
+TARGET.mkdir(parents=True, exist_ok=True)
 
-rule init_symlink:
-    output:
-        SYMLINK
-    run:
-        TARGET.mkdir(parents=True, exist_ok=True)
-
-        if SYMLINK.exists() or SYMLINK.is_symlink():
-            if SYMLINK.is_dir() and not SYMLINK.is_symlink():
-                shutil.rmtree(SYMLINK)
-            else:
-                SYMLINK.unlink()
-
+if SYMLINK.is_symlink():
+    if SYMLINK.resolve() != TARGET.resolve():
+        SYMLINK.unlink()
         os.symlink(TARGET, SYMLINK)
+elif SYMLINK.exists():
+    if SYMLINK.is_dir():
+        shutil.rmtree(SYMLINK)
+    else:
+        SYMLINK.unlink()
+    os.symlink(TARGET, SYMLINK)
+else:
+    os.symlink(TARGET, SYMLINK)
 
 ##### entry point #####
 rule all:
     input:
-        SYMLINK,
         BASE / "hybrid_temp/drep/hybrid/Cdb.csv",
         BASE / "result/metawrap_bins/hybrid/hybrid_genomeInfo.csv",
         expand("m/{sample}_binning/bin_reassembly/reassembly_results.png", sample=SAMPLES),
