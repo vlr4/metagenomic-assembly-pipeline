@@ -4,14 +4,14 @@ rule binning:
         r1 = INPUT['read_qc'] / "{sample}" / "final_pure_reads_1.fastq",
         r2 = INPUT['read_qc'] / "{sample}" / "final_pure_reads_2.fastq"
     output:
-        concoct_dir = directory(BASE / config['output']['assembly']['binning'] / "{sample}_binning" / "concoct_bins"),
-        metabat2_dir = directory(BASE / config['output']['assembly']['binning'] / "{sample}_binning" / "metabat2_bins"),
-        maxbin2_dir  = directory(BASE / config['output']['assembly']['binning'] / "{sample}_binning" / "maxbin2_bins"),
-        concoct_bin = BASE / config['output']['assembly']['binning'] / "{sample}_binning" / "concoct_bins" / "bin.1.fa",
-        metabat2_bin = BASE / config['output']['assembly']['binning'] / "{sample}_binning" / "metabat2_bins/bin.1.fa",
-        maxbin2_bin = BASE / config['output']['assembly']['binning'] / "{sample}_binning" / "maxbin2_bins/bin.1.fa"
+        concoct_dir = directory(SYMLINK / "{sample}_binning" / "concoct_bins"),
+        metabat2_dir = directory(SYMLINK / "{sample}_binning" / "metabat2_bins"),
+        maxbin2_dir  = directory(SYMLINK / "{sample}_binning" / "maxbin2_bins"),
+        concoct_bin = SYMLINK / "{sample}_binning" / "concoct_bins" / "bin.1.fa",
+        metabat2_bin = SYMLINK / "{sample}_binning" / "metabat2_bins/bin.1.fa",
+        maxbin2_bin = SYMLINK / "{sample}_binning" / "maxbin2_bins/bin.1.fa"
     params: 
-        sample_dir = BASE / config['output']['assembly']['binning'] / "{sample}_binning"
+        sample_dir = SYMLINK / "{sample}_binning"
     threads: config["threads"]["binning"]
 #    conda: "../envs/metawrap.yaml"
     shell:
