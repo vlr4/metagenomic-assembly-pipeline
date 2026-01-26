@@ -4,9 +4,12 @@ rule binning:
         r1 = lambda wc: str(BASE / f"{config['output']['qc']['read_qc']}/{wc.sample}/final_pure_reads_1.fastq"),
         r2 = lambda wc: str(BASE / f"{config['output']['qc']['read_qc']}/{wc.sample}/final_pure_reads_2.fastq")
     output:
+        concoct_dir = directory(BASE / config['output']['assembly']['binning'] / "{sample}_binning" / "concoct_bins"),
+        metabat2_dir = directory(BASE / config['output']['assembly']['binning'] / "{sample}_binning" / "metabat2_bins"),
+        maxbin2_dir  = directory(BASE / config['output']['assembly']['binning'] / "{sample}_binning" / "maxbin2_bins"),
         concoct_bin = BASE / config['output']['assembly']['binning'] / "{sample}_binning" / "concoct_bins" / "bin.1.fa",
-        metabat2 = BASE / config['output']['assembly']['binning'] / "{sample}_binning" / "metabat2_bins/bin.1.fa",
-        maxbin2 = BASE / config['output']['assembly']['binning'] / "{sample}_binning" / "maxbin2_bins/bin.1.fa"
+        metabat2_bin = BASE / config['output']['assembly']['binning'] / "{sample}_binning" / "metabat2_bins/bin.1.fa",
+        maxbin2_bin = BASE / config['output']['assembly']['binning'] / "{sample}_binning" / "maxbin2_bins/bin.1.fa"
     params: 
         sample_dir = lambda wc: str(BASE / config['output']['assembly']['binning'] / f"{wc.sample}_binning")
     threads: config["threads"]["binning"]
