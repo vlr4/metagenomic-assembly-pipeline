@@ -18,33 +18,32 @@ INPUT = {
     for k in ("long_reads", "short_reads", "read_qc", "dehost")
 }
 
-DB = Path(config["input"]["databases"])  
+DB = Path(config["input"]["databases"])
 REFERENCE_HUMAN = DB / config["reference"]["human"]
 
 ##### samples #####
 with open(SAMPLES_FILE) as f:
     next(f)
-    SAMPLES = [
-        l.split()[0]
-        for l in f
-        if l.strip()
-    ]
+    SAMPLES = [l.split()[0] for l in f if l.strip()]
 
-##### symlink handling #####
+##### symlink handling (MUST be local) #####
 SYMLINK = Path("m")
 TARGET = BASE / "hybrid_temp/binning"
+
+localrules: init_symlink
 
 rule init_symlink:
     output:
         SYMLINK
     run:
+        TARGET.mkdir(parents=True, exist_ok=True)
+
         if SYMLINK.exists() or SYMLINK.is_symlink():
-            if SYMLINK.is_symlink() and SYMLINK.resolve() == TARGET.resolve():
-                return
             if SYMLINK.is_dir() and not SYMLINK.is_symlink():
                 shutil.rmtree(SYMLINK)
             else:
                 SYMLINK.unlink()
+
         os.symlink(TARGET, SYMLINK)
 
 ##### entry point #####
