@@ -1,8 +1,8 @@
 rule binning:
-    input:
-        assembly = lambda wc: str(BASE / f"{config['output']['assembly']['spades']}/{wc.sample}_assembly/contigs.fasta"),
-        r1 = lambda wc: str(BASE / f"{config['output']['qc']['read_qc']}/{wc.sample}/final_pure_reads_1.fastq"),
-        r2 = lambda wc: str(BASE / f"{config['output']['qc']['read_qc']}/{wc.sample}/final_pure_reads_2.fastq")
+    input:"
+        assembly = BASE / config['output']['assembly']['spades'] / "{sample}_assembly" / "contigs.fasta",
+        r1 = INPUT['read_qc'] / "{sample}" / "final_pure_reads_1.fastq",
+        r2 = INPUT['read_qc'] / "{sample}" / "final_pure_reads_2.fastq"
     output:
         concoct_dir = directory(BASE / config['output']['assembly']['binning'] / "{sample}_binning" / "concoct_bins"),
         metabat2_dir = directory(BASE / config['output']['assembly']['binning'] / "{sample}_binning" / "metabat2_bins"),
@@ -11,7 +11,7 @@ rule binning:
         metabat2_bin = BASE / config['output']['assembly']['binning'] / "{sample}_binning" / "metabat2_bins/bin.1.fa",
         maxbin2_bin = BASE / config['output']['assembly']['binning'] / "{sample}_binning" / "maxbin2_bins/bin.1.fa"
     params: 
-        sample_dir = lambda wc: str(BASE / config['output']['assembly']['binning'] / f"{wc.sample}_binning")
+        sample_dir = BASE / config['output']['assembly']['binning'] / "{sample}_binning"
     threads: config["threads"]["binning"]
 #    conda: "../envs/metawrap.yaml"
     shell:
