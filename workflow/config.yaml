@@ -10,7 +10,7 @@ input:
   short_reads: "illumina"
   databases: "/mnt/shared/scratch/vtelizhe/metagenomic_networks/databases"
 
-# Reference genome
+# Reference genomes / databases
 reference:
   human: "human_genome/hg38.fa"
 
@@ -19,6 +19,8 @@ output:
   dehost: 
     sam: "nano_dehost"
     result: "result/dehost"
+  qc:
+    read_qc: "read_qc"
   assembly:
     spades: "hybrid_temp/spades"
     binning: "hybrid_temp/binning"
