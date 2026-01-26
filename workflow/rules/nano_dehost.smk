@@ -1,6 +1,6 @@
 rule nano_dehost:
     input:
-        fastq = INPUT["long_reads"] + "/{sample}.fastq",
+        fastq = INPUT["long_reads"] / "{sample}.fastq",
         ref = REFERENCE_HUMAN
     output:
         sam = BASE / config["output"]["dehost"]["sam"] / "{sample}.sam",
