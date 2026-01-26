@@ -10,7 +10,7 @@ rule read_qc:
         host_r1 = BASE / config["output"]["qc"]["read_qc"] / "{sample}/host_reads_1.fastq",
         host_r2 = BASE / config["output"]["qc"]["read_qc"] / "{sample}/host_reads_2.fastq"
     params:
-        sample_dir = BASE / config["output"]["qc"]["read_qc"] / "{sample}"
+        sample_dir = lambda wc: BASE / config["output"]["qc"]["read_qc"] / wc.sample
     threads:
         config["threads"]["qc"]
     shell:
