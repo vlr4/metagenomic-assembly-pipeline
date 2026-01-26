@@ -1,8 +1,8 @@
 rule binning:
     input:
         assembly = BASE / config['output']['assembly']['spades'] / "{sample}_assembly" / "contigs.fasta",
-        r1 = INPUT['read_qc'] / "{sample}" / "final_pure_reads_1.fastq",
-        r2 = INPUT['read_qc'] / "{sample}" / "final_pure_reads_2.fastq"
+        r1 = BASE / config["output"]["qc"]["read_qc"] / "{sample}" / "final_pure_reads_1.fastq",
+        r2 = BASE / config["output"]["qc"]["read_qc"] / "{sample}" / "final_pure_reads_2.fastq"
     output:
         concoct_dir = directory(SYMLINK / "{sample}_binning" / "concoct_bins"),
         metabat2_dir = directory(SYMLINK / "{sample}_binning" / "metabat2_bins"),

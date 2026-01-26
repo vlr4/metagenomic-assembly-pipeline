@@ -1,7 +1,7 @@
 rule assembly:
     input:
-        r1 = INPUT["read_qc"] / "{sample}/final_pure_reads_1.fastq",
-        r2 = INPUT["read_qc"] / "{sample}/final_pure_reads_2.fastq",
+        r1 = BASE / config["output"]["qc"]["read_qc"] / "{sample}/final_pure_reads_1.fastq",
+        r2 = BASE / config["output"]["qc"]["read_qc"] / "{sample}/final_pure_reads_2.fastq",
         nano = BASE / config["output"]["dehost"]["sam"] / "nano.{sample}.dehost.fq.gz"
     output:
         spades_contigs = BASE / config["output"]["assembly"]["spades"] / "{sample}_assembly/contigs.fasta"

@@ -15,7 +15,7 @@ SAMPLES_FILE = BASE / config["samples"]
 
 INPUT = {
     k: BASE / config["input"][k]
-    for k in ("long_reads", "short_reads", "read_qc", "dehost")
+    for k in ("long_reads", "short_reads")
 }
 
 DB = Path(config["input"]["databases"])
@@ -57,10 +57,15 @@ rule all:
         expand(SYMLINK / "{sample}_binning/maxbin2_bins/bin.1.fa", sample=SAMPLES),
         expand(BASE / config["output"]["assembly"]["spades"] / "{sample}_assembly/contigs.fasta", sample=SAMPLES),
         expand(BASE / config["output"]["qc"]["read_qc"] / "{sample}/final_pure_reads_1.fastq", sample=SAMPLES),
+        REFERENCE_HUMAN.with_suffix(".bitmask"),
+        REFERENCE_HUMAN.with_suffix(".srprism"),
         expand(BASE / config["output"]["dehost"]["sam"] / "nano.{sample}.dehost.fq.gz", sample=SAMPLES)
+        
 
 ##### load rules #####
+
 include: "rules/nano_dehost.smk"
+include: "rules/bmtagger_index.smk"
 include: "rules/read_qc.smk"
 include: "rules/assembly.smk"
 include: "rules/binning.smk"

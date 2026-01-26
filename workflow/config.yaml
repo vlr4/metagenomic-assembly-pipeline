@@ -8,11 +8,9 @@ samples: "sample_design.txt"
 input:
   long_reads: "nanopore"
   short_reads: "illumina"
-  read_qc: "read_qc"
-  dehost: "nano_dehost"
   databases: "/mnt/shared/scratch/vtelizhe/metagenomic_networks/databases"
 
-# Reference genomes / databases
+# Reference genome
 reference:
   human: "human_genome/hg38.fa"
 
@@ -21,8 +19,6 @@ output:
   dehost: 
     sam: "nano_dehost"
     result: "result/dehost"
-  qc:
-    read_qc: "read_qc"
   assembly:
     spades: "hybrid_temp/spades"
     binning: "hybrid_temp/binning"
