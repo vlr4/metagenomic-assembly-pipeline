@@ -1,14 +1,15 @@
 rule bin_refinement:
     input:
-        metabat2 = "m/{sample}_binning/metabat2_bins",
-        maxbin2  = "m/{sample}_binning/maxbin2_bins",
-        concoct  = "m/{sample}_binning/concoct_bins"
+        metabat2 = lambda wc: f"m/{wc.sample}_binning/metabat2_bins",
+        maxbin2 = lambda wc: f"m/{wc.sample}_binning/maxbin2_bins",
+        concoct = lambda wc: f"m/{wc.sample}_binning/concoct_bins"
     output:
-        stats = "m/{sample}_binning/bin_refinement/metawrap_70_10_bins.stats"
+        stats = SYMLINK / "{sample}_binning" / "bin_refinement" / "metawrap_70_10_bins.stats"
     params:
-        out_dir = "m/{sample}_binning/bin_refinement"
-    threads:
-        config["threads"]["refinement"]
+        out_dir = SYMLINK / "{sample}_binning/bin_refinement"
+    threads: config["threads"]["refinement"]
+#    conda: "../envs/metawrap.yaml"
+    
     shell:
         """
         source activate metawrap-env

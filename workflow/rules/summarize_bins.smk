@@ -1,13 +1,11 @@
-
 rule summarize_bins:
     input:
-        "m/{sample}_binning/bin_reassembly/reassembled_bins.stats"
+        expand("m/{sample}_binning/bin_reassembly/reassembled_bins.stats", sample=SAMPLES)
     output:
-        csv = BASE / "result/metawrap_bins/hybrid/hybrid_genomeInfo.csv"
+        csv = str(BASE / "result/metawrap_bins/hybrid/hybrid_genomeInfo.csv")
     params:
-        outdir = BASE / "result/metawrap_bins/hybrid"
-    threads:
-        2
+        outdir = str(BASE / "result/metawrap_bins/hybrid")
+    threads: 2
     resources:
         mem_mb = 16000
     shell:
@@ -27,3 +25,4 @@ rule summarize_bins:
             done
         done
         """
+
