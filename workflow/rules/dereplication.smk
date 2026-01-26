@@ -1,7 +1,7 @@
 rule dereplication:
     input:
-        bins = str(BASE / "result/metawrap_bins/hybrid"),
-        info    = str(BASE / "result/metawrap_bins/hybrid/hybrid_genomeInfo.csv")
+        bins = BASE / "result/metawrap_bins/hybrid",
+        info = BASE / "result/metawrap_bins/hybrid/hybrid_genomeInfo.csv"
     output:
         comparisons = str(BASE / "hybrid_temp/drep/hybrid/Cdb.csv")
     params:
