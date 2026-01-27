@@ -3,10 +3,11 @@ rule dereplication:
         bins = BASE / "result/metawrap_bins/hybrid",
         info = BASE / "result/metawrap_bins/hybrid/hybrid_genomeInfo.csv"
     output:
-        comparisons = str(BASE / "hybrid_temp/drep/hybrid/Cdb.csv")
+        comparisons = str(BASE / "hybrid_temp/drep/hybrid/Cdb.csv"),
+        final_dir = directory(BASE / "result/drep_bins/hybrid")
     params:
-        outdir = str(BASE / "hybrid_temp/drep/hybrid"),
-        final  = str(BASE / "result/drep_bins/hybrid")
+        outdir = subpath(output.drep_db, parent=True),
+        
     threads: 80
     resources:
         mem_mb = 64000
@@ -20,6 +21,5 @@ rule dereplication:
             -p {threads} \
             --genomeInfo {input.info}
 
-        mkdir -p {params.final}
-        cp -r {params.outdir}/dereplicated_genomes {params.final}/
+        cp -r {params.outdir}/dereplicated_genomes {output.final}/
         """

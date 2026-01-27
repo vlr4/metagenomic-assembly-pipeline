@@ -1,18 +1,16 @@
 rule summarize_bins:
     input:
-        expand("m/{sample}_binning/bin_reassembly/reassembled_bins.stats", sample=SAMPLES)
+        expand(SYMLINK / "{sample}_binning/bin_reassembly/reassembled_bins.stats", sample=SAMPLES)
     output:
         csv = BASE / "result/metawrap_bins/hybrid/hybrid_genomeInfo.csv",
-        out_dir = BASE / "result/metawrap_bins/hybrid"
+        out_dir = directory(BASE / "result/metawrap_bins/hybrid")
     params:
-        outdir = str(BASE / "result/metawrap_bins/hybrid")
+        outdir = subpath(output.csv, parent=True)
     threads: 2
     resources:
         mem_mb = 16000
     shell:
         """
-        mkdir -p {params.outdir}
-
         csv_out={params.outdir}/hybrid_genomeInfo.csv
         echo "genome,completeness,contamination,GC,lineage,N50,size" > "$csv_out"
 

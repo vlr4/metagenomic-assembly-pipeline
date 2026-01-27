@@ -11,14 +11,13 @@ rule binning:
         metabat2_bin = SYMLINK / "{sample}_binning" / "metabat2_bins/bin.1.fa",
         maxbin2_bin = SYMLINK / "{sample}_binning" / "maxbin2_bins/bin.1.fa"
     params: 
-        sample_dir = SYMLINK / "{sample}_binning"
+        sample_dir = subpath(output.concoct_dir, parent=True)
     threads: config["threads"]["binning"]
 #    conda: "../envs/metawrap.yaml"
     shell:
         """
         source activate metawrap-env
         export OPENBLAS_NUM_THREADS=1
-        mkdir -p {params.sample_dir}
         metawrap binning \
           -o {params.sample_dir} \
           -t {threads} \

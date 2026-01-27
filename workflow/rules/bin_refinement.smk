@@ -7,7 +7,7 @@ rule bin_refinement:
         stats = SYMLINK / "{sample}_binning" / "bin_refinement" / "metawrap_70_10_bins.stats",
         bins  = directory(SYMLINK / "{sample}_binning" / "bin_refinement" / "metawrap_70_10_bins")
     params:
-        out_dir = SYMLINK / "{sample}_binning/bin_refinement"
+        out_dir = subpath(output.bins, parent=True)
     threads: config["threads"]["refinement"]
 #    conda: "../envs/metawrap.yaml"
     
@@ -15,7 +15,6 @@ rule bin_refinement:
         """
         source activate metawrap-env
         export PATH=/mnt/apps/users/vtelizhe/conda/envs/metawrap-env/bin:$PATH
-        mkdir -p {params.out_dir}
         metawrap bin_refinement \
           -o {params.out_dir} \
           -A {input.metabat2} \

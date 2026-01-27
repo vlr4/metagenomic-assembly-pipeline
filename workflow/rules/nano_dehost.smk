@@ -8,15 +8,12 @@ rule nano_dehost:
         copied = BASE / config["output"]["dehost"]["result"] / "{sample}.unmapped.names",
         dehosted = BASE / config["output"]["dehost"]["sam"] / "nano.{sample}.dehost.fq.gz"
     params:
-        sam_dir = BASE / config["output"]["dehost"]["sam"],
-        result_dir = BASE / config["output"]["dehost"]["result"],
         minimap2_options = config["minimap2"]["options"]
     threads:
         config["threads"]["dehost"]
     shell:
         """
         source activate nanosoft
-        mkdir -p {params.sam_dir} {params.result_dir}
         minimap2 {params.minimap2_options} -t {threads} {input.ref} {input.fastq} > {output.sam}
         awk '($$2==4){{print $$1}}' {output.sam} > {output.unmapped}
         cp {output.unmapped} {output.copied}

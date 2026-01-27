@@ -6,7 +6,7 @@ rule assembly:
     output:
         spades_contigs = BASE / config["output"]["assembly"]["spades"] / "{sample}_assembly/contigs.fasta"
     params:
-        spades_dir = BASE / config["output"]["assembly"]["spades"] / "{sample}_assembly",
+        spades_dir = subpath(output.spades_contigs, parent=True),
         spades_opts = config["spades"]["options"],
         spades_mem = config["spades"]["memory"]
     threads:
@@ -14,7 +14,6 @@ rule assembly:
     shell:
         """
         source activate metawrap-env
-        mkdir -p {params.spades_dir}
         spades.py {params.spades_opts} \
           -1 {input.r1} -2 {input.r2} \
           --nanopore {input.nano} \

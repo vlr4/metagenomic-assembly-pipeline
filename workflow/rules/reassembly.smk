@@ -7,7 +7,7 @@ rule reassembly:
         stats = SYMLINK / "{sample}_binning" / "bin_reassembly" / "reassembled_bins.stats",
         plot = SYMLINK / "{sample}_binning" / "bin_reassembly" / "reassembly_results.png"
     params:
-        out_dir = SYMLINK / "{sample}_binning" / "bin_reassembly"
+        out_dir = subpath(output.stats, parent=True)
     
 #    conda: "../envs/metawrap.yaml"
     threads: 4
@@ -17,7 +17,6 @@ rule reassembly:
         """
         source activate metawrap-env
         export PATH=/mnt/apps/users/vtelizhe/conda/envs/metawrap-env/bin:$PATH
-        mkdir -p {params.out_dir}
         metawrap reassemble_bins \
           -o {params.out_dir} \
           -1 {input.r1} \
