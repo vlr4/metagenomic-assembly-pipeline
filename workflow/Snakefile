@@ -20,6 +20,7 @@ INPUT = {
 
 DB = Path(config["input"]["databases"])
 REFERENCE_HUMAN = DB / config["reference"]["human"]
+HUMAN_DIR = REFERENCE_HUMAN.parent
 HG = Path(config["reference"]["human"]).stem
 
 
@@ -59,7 +60,7 @@ rule all:
         expand(SYMLINK / "{sample}_binning/maxbin2_bins/bin.1.fa", sample=SAMPLES),
         expand(BASE / config["output"]["assembly"]["spades"] / "{sample}_assembly/contigs.fasta", sample=SAMPLES),
         expand(BASE / config["output"]["qc"]["read_qc"] / "{sample}/final_pure_reads_1.fastq", sample=SAMPLES),
-        expand(DB / f"{HG}.bitmask"),
+        expand(HUMAN_DIR / f"{HG}.bitmask"),
         expand(BASE / config["output"]["dehost"]["sam"] / "nano.{sample}.dehost.fq.gz", sample=SAMPLES)
         
 

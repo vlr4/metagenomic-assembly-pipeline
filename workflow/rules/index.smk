@@ -3,7 +3,7 @@ rule bmtagger_index:
     input:
         fasta = REFERENCE_HUMAN
     output:
-        bitmask = DB / "{HG}.bitmask"
+        bitmask = HUMAN_DIR /  "{HG}.bitmask"
     shell:
         """
         source activate sra_tools
@@ -12,6 +12,6 @@ rule bmtagger_index:
 
         srprism mkindex \
             -i {input.fasta} \
-            -o {DB}/{HG}.srprism \
+            -o {HUMAN_DIR}/{HG}.srprism \
             -M 16000
         """
