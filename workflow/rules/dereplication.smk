@@ -6,7 +6,7 @@ rule dereplication:
         comparisons = str(BASE / "hybrid_temp/drep/hybrid/Cdb.csv"),
         final_dir = directory(BASE / "result/drep_bins/hybrid")
     params:
-        outdir = subpath(output.drep_db, parent=True),
+        outdir = subpath(output.comparisons, parent=True),
         
     threads: 80
     resources:
