@@ -21,5 +21,5 @@ rule dereplication:
             -p {threads} \
             --genomeInfo {input.info}
 
-        cp -r {params.outdir}/dereplicated_genomes {output.final}/
+        cp -r {params.outdir}/dereplicated_genomes {output.final_dir}/
         """
