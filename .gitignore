@@ -26,3 +26,4 @@ output/
 
 # Ignore snakemake logs directory
 .snakemake/
+workflow/m

@@ -52,7 +52,7 @@ else:
 ##### entry point #####
 rule all:
     input:
-        BASE / "hybrid_temp/drep/hybrid/Cdb.csv",
+        BASE / "hybrid_temp/drep/hybrid/data_tables/Cdb.csv",
         BASE / "result/metawrap_bins/hybrid/hybrid_genomeInfo.csv",
         expand(SYMLINK / "{sample}_binning/bin_reassembly/reassembly_results.png", sample=SAMPLES),
         expand(SYMLINK / "{sample}_binning/bin_refinement/metawrap_70_10_bins.stats", sample=SAMPLES),
