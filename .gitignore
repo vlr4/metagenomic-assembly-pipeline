@@ -26,4 +26,6 @@ output/
 
 # Ignore snakemake logs directory
 .snakemake/
-workflow/m
+
+# Machine-specific paths
+config/paths.yaml
