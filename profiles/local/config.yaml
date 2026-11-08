@@ -1,0 +1,8 @@
+# Local Linux profile. Host: 8 cores, 23 GB RAM.
+software-deployment-method: apptainer
+apptainer-args: "--cleanenv --bind $HOME"
+cores: 8
+printshellcmds: true
+# Total memory Snakemake may schedule at once (23 GB host).
+resources:
+  - mem_mb=20000

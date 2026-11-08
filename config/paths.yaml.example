@@ -1,0 +1,4 @@
+# Machine-specific paths. Copy to config/paths.yaml and pass it as the last --configfile.
+sif_dir: "/path/to/sif"
+db_dir: "/path/to/db"
+data_dir: "/path/to/data"
