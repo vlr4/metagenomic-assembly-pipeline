@@ -1,7 +1,6 @@
 # Production config. Test runs overlay config/test.yaml (--configfile config/test.yaml).
 
-# Machine-specific paths (sif_dir, db_dir, data_dir) are left empty here and set in an untracked
-# config/paths.yaml (template: config/paths.yaml.example), passed as the last --configfile.
+# sif_dir, db_dir and data_dir are set in config/paths.yaml (see config/paths.yaml.example).
 # Directory holding the .sif images.
 sif_dir: ""
 # Database root: host index, CheckM2, GUNC.
@@ -45,8 +44,7 @@ thresholds:
 read_qc:
   extra: "--skip-pre-qc-report --skip-post-qc-report"
 
-# Written into the generated metawrap2.toml. Thread/memory fractions are 1.0 so -t/-m from
-# Snakemake are not capped at MetaWrap2's default 50%/80% budget.
+# Written into the generated metawrap2.toml (thread/memory limits set to 1.0).
 metawrap2:
   max_disk_fraction: 0.7
 

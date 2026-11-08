@@ -1,0 +1,21 @@
+# dehost: minimap2 + samtools for ONT host-read removal.
+# Build: see containers/VERSIONS.md.
+
+Bootstrap: docker
+From: mambaorg/micromamba:2.8.0-debian12-slim
+
+%post
+    set -eu
+    micromamba install -y -r /opt/conda -n base -c conda-forge -c bioconda \
+        minimap2=2.31 samtools=1.24 pigz
+    micromamba clean --all --yes
+
+%environment
+    export PATH=/opt/conda/bin:$PATH
+
+%runscript
+    exec "$@"
+
+%labels
+    minimap2 2.31
+    samtools 1.24

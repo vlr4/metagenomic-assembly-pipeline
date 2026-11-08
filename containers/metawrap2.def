@@ -1,0 +1,37 @@
+# MetaWrap2 2.1.3 (pinned commit) with the reads, bins, binqc, checkm2 and learned envs,
+# built from the upstream lockfiles. Based on MetaWrap2's containers/metawrap2.def.
+# Build: see containers/VERSIONS.md.
+
+Bootstrap: docker
+From: condaforge/miniforge3:26.7.2-0
+
+%post
+    set -eu
+    MW2_COMMIT=9e56004124a87f976949eb9c2b886bf5cd6cb5a9
+
+    mkdir -p /opt/metawrap2
+    python3 -c "import urllib.request; urllib.request.urlretrieve('https://github.com/ursky/MetaWrap2/archive/${MW2_COMMIT}.tar.gz', '/tmp/mw2.tar.gz')"
+    tar -xzf /tmp/mw2.tar.gz -C /opt/metawrap2 --strip-components=1
+    rm /tmp/mw2.tar.gz
+    echo "${MW2_COMMIT}" > /opt/metawrap2/COMMIT
+
+    mamba install -y -n base -c conda-forge -c bioconda \
+        "python>=3.10" "biopython>=1.79" "numpy>=1.20" "pandas>=1.3" \
+        "matplotlib-base>=3.5" "seaborn>=0.11" "scipy>=1.7" "tqdm>=4.60" pip
+    pip install --no-cache-dir /opt/metawrap2
+
+    LOCKS=/opt/metawrap2/src/metawrap2/envs/locks
+    for env in reads bins binqc checkm2 learned; do
+        mamba create -y -n metawrap2-${env} --file ${LOCKS}/${env}.linux-64.lock
+    done
+    mamba clean --all --yes
+
+%environment
+    export PATH=/opt/conda/bin:$PATH
+
+%runscript
+    exec "$@"
+
+%labels
+    metawrap2.version 2.1.3
+    metawrap2.commit 9e56004124a87f976949eb9c2b886bf5cd6cb5a9
