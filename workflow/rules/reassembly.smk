@@ -1,29 +1,76 @@
-rule reassembly:
+# Reassembly: MetaWrap2 reassemble_bins (strict/permissive, with ONT reads),
+# then selection of the best version of each bin with CheckM2.
+
+rule reassemble_bins:
     input:
-        r1 = BASE / config["output"]["qc"]["read_qc"] / "{sample}" / "final_pure_reads_1.fastq",
-        r2 = BASE / config["output"]["qc"]["read_qc"] / "{sample}" / "final_pure_reads_2.fastq",
-        refined = SYMLINK / "{sample}_binning" / "bin_refinement" / "metawrap_70_10_bins"   
+        bins=rules.bin_refinement.output.bins,
+        r1=rules.read_qc.output.r1,
+        r2=rules.read_qc.output.r2,
+        ont=rules.nano_dehost.output.fq,
+        toml=rules.metawrap2_config.output.toml,
     output:
-        stats = SYMLINK / "{sample}_binning" / "bin_reassembly" / "reassembled_bins.stats",
-        plot = SYMLINK / "{sample}_binning" / "bin_reassembly" / "reassembly_results.png"
+        outdir=directory(TMP / "reassembly" / "{sample}"),
     params:
-        out_dir = subpath(output.stats, parent=True),
-        mem_gb = config["mem"]["reassembly"]
-    
-#    conda: "../envs/metawrap.yaml"
-    threads: 
-        config["threads"]["reassembly"]
+        mem_gb=mem_gb,
+    container:
+        sif("metawrap2")
+    threads: res("reassemble_bins", "threads")
     resources:
-        mem_mb = math.ceil(config["mem"]["reassembly"] * 1.2 * 1024)
+        mem_mb=res("reassemble_bins", "mem_mb"),
+        runtime=res("reassemble_bins", "runtime"),
+    log:
+        "logs/reassemble_bins/{sample}.log",
+    benchmark:
+        "benchmarks/reassemble_bins/{sample}.tsv"
     shell:
         """
-        source activate metawrap-env
-        export PATH=/mnt/apps/users/vtelizhe/conda/envs/metawrap-env/bin:$PATH
-        metawrap reassemble_bins \
-          -o {params.out_dir} \
-          -1 {input.r1} \
-          -2 {input.r2} \
-          -b {input.refined} \
-          -t {threads} -m {params.mem_gb} -c 70 -x 10 \
-          
+        if ls {input.bins}/*.fasta > /dev/null 2>&1; then
+            metawrap2 --force reassemble_bins --config {input.toml} \
+                -o {output.outdir} -b {input.bins} -1 {input.r1} -2 {input.r2} \
+                --nanopore {input.ont} -t {threads} -m {params.mem_gb} -c {COMP} -x {CONT} \
+                --skip-checkm > {log} 2>&1
+            rm -rf {output.outdir}/reads_for_reassembly {output.outdir}/reassemblies \
+                {output.outdir}/binned_assembly
+        else
+            mkdir -p {output.outdir}/original_bins {output.outdir}/reassembled_bins
+            echo "no refined bins; reassembly skipped" > {log}
+        fi
+        """
+
+
+rule reassembly_select:
+    input:
+        reassembly=rules.reassemble_bins.output.outdir,
+        dmnd=rules.checkm2_db.output.dmnd,
+    output:
+        bins=directory(TMP / "reassembly_select" / "{sample}" / "bins"),
+        stats=TMP / "reassembly_select" / "{sample}" / "bins.stats.tsv",
+    params:
+        workdir=str(TMP / "reassembly_select" / "{sample}"),
+        script=SCRIPTS / "select_reassembled_bins.py",
+    container:
+        sif("metawrap2")
+    threads: res("reassembly_select", "threads")
+    resources:
+        mem_mb=res("reassembly_select", "mem_mb"),
+        runtime=res("reassembly_select", "runtime"),
+    log:
+        "logs/reassembly_select/{sample}.log",
+    benchmark:
+        "benchmarks/reassembly_select/{sample}.tsv"
+    shell:
+        """
+        cand={params.workdir}/candidates
+        report={params.workdir}/checkm2/quality_report.tsv
+        rm -rf $cand {params.workdir}/checkm2
+        python {params.script} stage --reassembly {input.reassembly} --candidates $cand > {log} 2>&1
+        if ls $cand/*.fasta > /dev/null 2>&1; then
+            mamba run -n metawrap2-checkm2 checkm2 predict --input $cand \
+                --output-directory {params.workdir}/checkm2 -x fasta --threads {threads} \
+                --database_path {input.dmnd} --force >> {log} 2>&1
+        fi
+        python {params.script} select --candidates $cand --report $report \
+            --completeness {COMP} --contamination {CONT} \
+            --out-bins {output.bins} --out-stats {output.stats} >> {log} 2>&1
+        rm -rf $cand
         """

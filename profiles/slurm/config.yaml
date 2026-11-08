@@ -1,0 +1,5 @@
+# SLURM profile (snakemake-executor-plugin-slurm).
+executor: slurm
+software-deployment-method: apptainer
+apptainer-args: "--cleanenv"
+printshellcmds: true

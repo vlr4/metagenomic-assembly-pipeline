@@ -1,72 +1,65 @@
-from snakemake.utils import min_version
 from pathlib import Path
-import shutil
-import math
-import os
+
+from snakemake.exceptions import WorkflowError
+from snakemake.utils import min_version
 
 ##### minimum snakemake version #####
 min_version("8.8.0")
 
-configfile: "config.yaml"
+configfile: Path(workflow.basedir) / "config.yaml"
+
+for _key in ("sif_dir", "db_dir", "data_dir"):
+    if not config.get(_key):
+        raise WorkflowError(
+            f"config '{_key}' is not set; pass config/paths.yaml as the last --configfile "
+            "(template: config/paths.yaml.example)"
+        )
 
 ##### resolve paths #####
-BASE = Path(config["data_dir"])
+SIF = Path(config["sif_dir"])
+DB = Path(config["db_dir"])
+DATA = Path(config["data_dir"])
+HOST = config["host"]["name"]
+SCRIPTS = Path(workflow.basedir) / "scripts"
 
-SAMPLES_FILE = BASE / config["samples"]
+# Outputs are relative to the Snakemake working directory (--directory <run dir>).
+TMP = Path("hybrid_temp")
+RES = Path("result")
 
-INPUT = {
-    k: BASE / config["input"][k]
-    for k in ("long_reads", "short_reads")
-}
+COMP = config["thresholds"]["completeness"]
+CONT = config["thresholds"]["contamination"]
+REFINED = f"metawrap_{COMP}_{CONT}_bins"
 
-DB = Path(config["input"]["databases"])
-REFERENCE_HUMAN = DB / config["reference"]["human"]
-HUMAN_DIR = REFERENCE_HUMAN.parent
-HG = Path(config["reference"]["human"]).stem
+
+def sif(name):
+    return str(SIF / config["containers"][name])
+
+
+def res(rule_name, key):
+    return config["resources"][rule_name][key]
+
+
+def mem_gb(wildcards, resources):
+    return max(1, resources.mem_mb // 1024)
 
 
 ##### samples #####
-with open(SAMPLES_FILE) as f:
+SAMPLE_SHEET = DATA / config["samples"]
+if not SAMPLE_SHEET.is_file():
+    raise WorkflowError(f"sample sheet not found: {SAMPLE_SHEET}")
+with open(SAMPLE_SHEET) as f:
     next(f)
     SAMPLES = [l.split()[0] for l in f if l.strip()]
+if not SAMPLES:
+    raise WorkflowError(f"no samples in {SAMPLE_SHEET}")
 
-##### Create symlink on startup to dodge CheckM error #####
-SYMLINK = Path("m")
-TARGET = BASE / config['output']['assembly']['binning']
+wildcard_constraints:
+    sample="|".join(SAMPLES),
 
-TARGET.mkdir(parents=True, exist_ok=True)
-
-if SYMLINK.is_symlink():
-    if SYMLINK.resolve() != TARGET.resolve():
-        SYMLINK.unlink()
-        os.symlink(TARGET, SYMLINK)
-elif SYMLINK.exists():
-    if SYMLINK.is_dir():
-        shutil.rmtree(SYMLINK)
-    else:
-        SYMLINK.unlink()
-    os.symlink(TARGET, SYMLINK)
-else:
-    os.symlink(TARGET, SYMLINK)
-
-##### entry point #####
-rule all:
-    input:
-        BASE / "hybrid_temp/drep/hybrid/data_tables/Cdb.csv",
-        BASE / "result/metawrap_bins/hybrid/hybrid_genomeInfo.csv",
-        expand(SYMLINK / "{sample}_binning/bin_reassembly/reassembly_results.png", sample=SAMPLES),
-        expand(SYMLINK / "{sample}_binning/bin_refinement/metawrap_70_10_bins.stats", sample=SAMPLES),
-        expand(SYMLINK / "{sample}_binning/concoct_bins/bin.1.fa", sample=SAMPLES),
-        expand(SYMLINK / "{sample}_binning/metabat2_bins/bin.1.fa", sample=SAMPLES),
-        expand(SYMLINK / "{sample}_binning/maxbin2_bins/bin.1.fa", sample=SAMPLES),
-        expand(BASE / config["output"]["assembly"]["spades"] / "{sample}_assembly/contigs.fasta", sample=SAMPLES),
-        expand(BASE / config["output"]["qc"]["read_qc"] / "{sample}/final_pure_reads_1.fastq", sample=SAMPLES),
-        expand(HUMAN_DIR / f"{HG}.bitmask"),
-        expand(BASE / config["output"]["dehost"]["sam"] / "nano.{sample}.dehost.fq.gz", sample=SAMPLES)
-        
 
 ##### load rules #####
 
+include: "rules/databases.smk"
 include: "rules/nano_dehost.smk"
 include: "rules/read_qc.smk"
 include: "rules/assembly.smk"
@@ -74,5 +67,14 @@ include: "rules/binning.smk"
 include: "rules/bin_refinement.smk"
 include: "rules/reassembly.smk"
 include: "rules/summarize_bins.smk"
-include: "rules/index.smk"
 include: "rules/dereplication.smk"
+
+##### entry point #####
+rule all:
+    default_target: True
+    input:
+        rules.databases.input,
+        expand(TMP / "read_qc" / "{sample}" / "fastp.json", sample=SAMPLES),
+        expand(TMP / "bin_refinement" / "{sample}" / f"{REFINED}.contigs.tsv", sample=SAMPLES),
+        rules.summarize_bins.output,
+        rules.drep.output.final,

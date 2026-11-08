@@ -1,8 +1,0 @@
-name: nano_dehost
-channels:
-  - conda-forge
-  - bioconda
-dependencies:
-  - python=3.8
-  - minimap2
-  - seqkit

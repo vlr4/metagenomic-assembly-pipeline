@@ -1,24 +1,42 @@
-rule assembly:
+# Hybrid assembly: metaSPAdes with cleaned Illumina PE + cleaned ONT.
+
+SPADES_KEEP = [
+    "contigs.fasta",
+    "scaffolds.fasta",
+    "contigs.paths",
+    "scaffolds.paths",
+    "assembly_graph_with_scaffolds.gfa",
+    "spades.log",
+    "params.txt",
+]
+
+
+rule spades:
     input:
-        r1 = BASE / config["output"]["qc"]["read_qc"] / "{sample}/final_pure_reads_1.fastq",
-        r2 = BASE / config["output"]["qc"]["read_qc"] / "{sample}/final_pure_reads_2.fastq",
-        nano = BASE / config["output"]["dehost"]["sam"] / "nano.{sample}.dehost.fq.gz"
+        r1=rules.read_qc.output.r1,
+        r2=rules.read_qc.output.r2,
+        ont=rules.nano_dehost.output.fq,
     output:
-        spades_contigs = BASE / config["output"]["assembly"]["spades"] / "{sample}_assembly/contigs.fasta"
+        contigs=TMP / "spades" / "{sample}" / "contigs.fasta",
     params:
-        spades_dir = subpath(output.spades_contigs, parent=True),
-        spades_opts = config["spades"]["options"],
-        spades_mem = config["mem"]["spades"]
-    threads:
-        config["threads"]["spades"]
+        outdir=lambda wildcards, output: Path(output.contigs).parent,
+        mem_gb=mem_gb,
+        keep=" ".join(f"! -name {n}" for n in SPADES_KEEP),
+    container:
+        sif("spades")
+    threads: res("spades", "threads")
     resources:
-        mem_mb = math.ceil(config["mem"]["spades"] * 1.2 * 1024)
+        mem_mb=res("spades", "mem_mb"),
+        runtime=res("spades", "runtime"),
+    log:
+        "logs/spades/{sample}.log",
+    benchmark:
+        "benchmarks/spades/{sample}.tsv"
     shell:
         """
-        source activate metawrap-env
-        spades.py {params.spades_opts} \
-          -1 {input.r1} -2 {input.r2} \
-          --nanopore {input.nano} \
-          --threads {threads} --memory {params.spades_mem} \
-          -o {params.spades_dir}
+        rm -rf {params.outdir}
+        spades.py --meta -1 {input.r1} -2 {input.r2} --nanopore {input.ont} \
+            -t {threads} -m {params.mem_gb} -o {params.outdir} > {log} 2>&1
+        # Drop per-k intermediates, corrected reads and tmp.
+        find {params.outdir} -mindepth 1 -maxdepth 1 {params.keep} -exec rm -rf {{}} +
         """

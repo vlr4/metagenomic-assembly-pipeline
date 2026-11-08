@@ -1,0 +1,28 @@
+# Test overlay (local Linux). Host = hg38 chr21 only; GUNC off. Paths come from config/paths.yaml.
+
+# md5 from UCSC hg38/chromosomes/md5sum.txt.
+host:
+  name: "chr21"
+  url: "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/chromosomes/chr21.fa.gz"
+  md5: "184df2bd9b812b6e6b6da16c6021369e"
+
+gunc:
+  enabled: false
+
+resources:
+  host_fasta: {threads: 1, mem_mb: 1000, runtime: 30}
+  bmtool: {threads: 1, mem_mb: 10000, runtime: 30}
+  srprism: {threads: 1, mem_mb: 4000, runtime: 60}
+  minimap2_index: {threads: 4, mem_mb: 2000, runtime: 30}
+  checkm2_db: {threads: 1, mem_mb: 2000, runtime: 120}
+  gunc_db: {threads: 1, mem_mb: 4000, runtime: 240}
+  metawrap2_config: {threads: 1, mem_mb: 1000, runtime: 10}
+  nano_dehost: {threads: 4, mem_mb: 4000, runtime: 60}
+  read_qc: {threads: 4, mem_mb: 12000, runtime: 120}
+  spades: {threads: 8, mem_mb: 16000, runtime: 240}
+  binning: {threads: 8, mem_mb: 12000, runtime: 240}
+  bin_refinement: {threads: 8, mem_mb: 16000, runtime: 180}
+  reassemble_bins: {threads: 8, mem_mb: 16000, runtime: 240}
+  reassembly_select: {threads: 8, mem_mb: 16000, runtime: 60}
+  summarize_bins: {threads: 1, mem_mb: 1000, runtime: 10}
+  drep: {threads: 4, mem_mb: 8000, runtime: 60}

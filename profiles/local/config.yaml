@@ -1,0 +1,8 @@
+# Local profile. Set cores and mem_mb to the machine.
+software-deployment-method: apptainer
+apptainer-args: "--cleanenv --bind $HOME"
+cores: 8
+printshellcmds: true
+# Total memory Snakemake may schedule at once.
+resources:
+  - mem_mb=20000

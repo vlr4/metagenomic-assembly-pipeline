@@ -1,55 +1,72 @@
-# Main working (data) directory
-data_dir: "/mnt/shared/scratch/vtelizhe/metagenomic_networks/new"
+# Production config. Test runs overlay config/test.yaml (--configfile config/test.yaml).
 
-# Sample design file
+# sif_dir, db_dir and data_dir are set in config/paths.yaml (see config/paths.yaml.example).
+# Directory holding the .sif images.
+sif_dir: ""
+# Database root: host index, CheckM2, GUNC.
+db_dir: ""
+
+# Inputs, relative to data_dir. {sample} = first column of the sample sheet (header line skipped).
+# Patterns may end in .fastq or .fastq.gz; every consuming tool reads both.
+data_dir: ""
 samples: "sample_design.txt"
+reads:
+  ont: "nanopore/{sample}.fastq"
+  illumina_r1: "illumina/{sample}_1.fastq"
+  illumina_r2: "illumina/{sample}_2.fastq"
 
-# Input directories
-input:
-  long_reads: "nanopore"
-  short_reads: "illumina"
-  databases: "/mnt/shared/scratch/vtelizhe/metagenomic_networks/databases"
+containers:
+  dehost: "dehost.sif"
+  spades: "spades_4.3.0.sif"
+  metawrap2: "metawrap2_2.1.3.sif"
+  drep: "drep_3.7.1.sif"
 
-# Reference genomes / databases
-reference:
-  human: "human_genome/hg38.fa"
+# Host reference: UCSC hg38 (full, incl. alt/random/chrUn). `name` is the prefix MetaWrap2
+# read_qc takes as -x; md5 from UCSC bigZips/md5sum.txt.
+host:
+  name: "hg38"
+  url: "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz"
+  md5: "1c9dcaddfa41027f17cd8f7a82c7293b"
 
-# Output directories
-output:
-  dehost: 
-    sam: "nano_dehost"
-    result: "result/dehost"
-  qc:
-    read_qc: "read_qc"
-  assembly:
-    spades: "hybrid_temp/spades"
-    binning: "hybrid_temp/binning"
-     
-# Resources
-threads:
-  dehost: 20
-  qc: 16
-  spades: 16
-  binning: 12
-  refinement: 4
-  reassembly: 12
-mem:
-  dehost: 16
-  qc: 16
-  spades: 64
-  binning: 128
-  refinement: 128
-  reassembly: 128
+# CheckM2 1.1.0 downloads DIAMOND DB v3 (10.5281/zenodo.14897628); sha256 from its version_hashes_1.1.0.json.
+checkm2:
+  sha256: "1b86ef3eac0813c1853f53182c17657045e3763d66f384ec95747261a63ae46f"
 
-# Tool-specific parameters
-minimap2:
-  options: "-ax map-ont"
+gunc:
+  enabled: true
+  db: "progenomes_2.1"
 
-seqkit:
-  options: ""
+# Bin quality thresholds: bin_refinement, reassembly selection, dRep.
+thresholds:
+  completeness: 70
+  contamination: 10
 
-metawrap:
-  read_qc_options: "--skip-pre-qc-report --skip-post-qc-report"
+read_qc:
+  extra: "--skip-pre-qc-report --skip-post-qc-report"
 
-spades:
-  options: "--meta"
+# Written into the generated metawrap2.toml (thread/memory limits set to 1.0).
+metawrap2:
+  max_disk_fraction: 0.7
+
+drep:
+  # -comp/-con come from thresholds.
+  params: "-pa 0.9 -sa 0.95 -nc 0.30 -cm larger --S_algorithm ANImf"
+
+# Per-rule threads, mem_mb, runtime (minutes).
+resources:
+  host_fasta: {threads: 1, mem_mb: 2000, runtime: 120}
+  bmtool: {threads: 1, mem_mb: 16000, runtime: 480}
+  srprism: {threads: 1, mem_mb: 64000, runtime: 720}
+  minimap2_index: {threads: 8, mem_mb: 16000, runtime: 120}
+  checkm2_db: {threads: 1, mem_mb: 2000, runtime: 120}
+  gunc_db: {threads: 1, mem_mb: 4000, runtime: 240}
+  metawrap2_config: {threads: 1, mem_mb: 1000, runtime: 10}
+  nano_dehost: {threads: 16, mem_mb: 32000, runtime: 480}
+  read_qc: {threads: 16, mem_mb: 32000, runtime: 720}
+  spades: {threads: 32, mem_mb: 250000, runtime: 2880}
+  binning: {threads: 16, mem_mb: 64000, runtime: 1440}
+  bin_refinement: {threads: 16, mem_mb: 64000, runtime: 720}
+  reassemble_bins: {threads: 16, mem_mb: 128000, runtime: 1440}
+  reassembly_select: {threads: 8, mem_mb: 32000, runtime: 240}
+  summarize_bins: {threads: 1, mem_mb: 2000, runtime: 30}
+  drep: {threads: 16, mem_mb: 64000, runtime: 720}
