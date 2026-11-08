@@ -1,26 +1,28 @@
-rule dereplication:
+# Dereplication (all samples): dRep with Chen's parameters, CheckM2 stats as genomeInfo.
+
+rule drep:
     input:
-        bins = BASE / "result/metawrap_bins/hybrid",
-        info = BASE / "result/metawrap_bins/hybrid/hybrid_genomeInfo.csv"
+        bins=rules.summarize_bins.output.bins,
+        info=rules.summarize_bins.output.info,
     output:
-        comparisons = str(BASE / "hybrid_temp/drep/hybrid/data_tables/Cdb.csv"),
-        final_dir = directory(BASE / "result/drep_bins/hybrid")
+        work=directory(TMP / "drep" / "hybrid"),
+        final=directory(RES / "drep_bins" / "hybrid" / "dereplicated_genomes"),
     params:
-        outdir = subpath(output.comparisons, ancestor=2),
-        
-    threads: 80
+        drep=config["drep"]["params"],
+    container:
+        sif("drep")
+    threads: res("drep", "threads")
     resources:
-        mem_mb = 64000
+        mem_mb=res("drep", "mem_mb"),
+        runtime=res("drep", "runtime"),
+    log:
+        "logs/drep.log",
+    benchmark:
+        "benchmarks/drep.tsv"
     shell:
         """
-        source activate drep
-        dRep dereplicate {params.outdir} \
-            -g {input.bins}/*fa \
-            -pa 0.9 -sa 0.95 -nc 0.30 -cm larger \
-            -comp 70 -con 10 \
-            -p {threads} \
-            --genomeInfo {input.info}
-        mkdir -p {output.final_dir}
-        rm -rf {output.final_dir}/dereplicated_genomes
-        cp -r {params.outdir}/dereplicated_genomes {output.final_dir}/
+        dRep dereplicate {output.work} -g {input.bins}/*.fa \
+            {params.drep} -comp {COMP} -con {CONT} -p {threads} \
+            --genomeInfo {input.info} > {log} 2>&1
+        cp -r {output.work}/dereplicated_genomes {output.final}
         """

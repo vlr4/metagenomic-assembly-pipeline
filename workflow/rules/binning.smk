@@ -1,27 +1,33 @@
+# Initial binning: MetaWrap2 binning with metaBAT2, MaxBin2, CONCOCT, SemiBin2 (short-read coverage).
+
+BINNERS = ["metabat2", "maxbin2", "concoct", "semibin2"]
+
+
 rule binning:
     input:
-        assembly = BASE / config['output']['assembly']['spades'] / "{sample}_assembly" / "contigs.fasta",
-        r1 = BASE / config["output"]["qc"]["read_qc"] / "{sample}" / "final_pure_reads_1.fastq",
-        r2 = BASE / config["output"]["qc"]["read_qc"] / "{sample}" / "final_pure_reads_2.fastq"
+        contigs=rules.spades.output.contigs,
+        r1=rules.read_qc.output.r1,
+        r2=rules.read_qc.output.r2,
+        toml=rules.metawrap2_config.output.toml,
     output:
-        concoct_dir = directory(SYMLINK / "{sample}_binning" / "concoct_bins"),
-        metabat2_dir = directory(SYMLINK / "{sample}_binning" / "metabat2_bins"),
-        maxbin2_dir  = directory(SYMLINK / "{sample}_binning" / "maxbin2_bins"),
-        concoct_bin = SYMLINK / "{sample}_binning" / "concoct_bins" / "bin.1.fa",
-        metabat2_bin = SYMLINK / "{sample}_binning" / "metabat2_bins/bin.1.fa",
-        maxbin2_bin = SYMLINK / "{sample}_binning" / "maxbin2_bins/bin.1.fa"
-    params: 
-        sample_dir = subpath(output.concoct_dir, parent=True)
-    threads: config["threads"]["binning"]
-#    conda: "../envs/metawrap.yaml"
+        **{b: directory(TMP / "binning" / "{sample}" / f"{b}_bins") for b in BINNERS},
+    params:
+        outdir=str(TMP / "binning" / "{sample}"),
+        mem_gb=mem_gb,
+        binners=" ".join(f"--{b}" for b in BINNERS),
+    container:
+        sif("metawrap2")
+    threads: res("binning", "threads")
+    resources:
+        mem_mb=res("binning", "mem_mb"),
+        runtime=res("binning", "runtime"),
+    log:
+        "logs/binning/{sample}.log",
+    benchmark:
+        "benchmarks/binning/{sample}.tsv"
     shell:
         """
-        source activate metawrap-env
-        export OPENBLAS_NUM_THREADS=1
-        metawrap binning \
-          -o {params.sample_dir} \
-          -t {threads} \
-          -a {input.assembly} \
-          --concoct --metabat2 --maxbin2 \
-          {input.r1} {input.r2}
+        metawrap2 --force binning --config {input.toml} \
+            -a {input.contigs} -o {params.outdir} -t {threads} -m {params.mem_gb} \
+            {params.binners} {input.r1} {input.r2} > {log} 2>&1
         """

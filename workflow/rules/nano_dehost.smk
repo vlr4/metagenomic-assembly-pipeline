@@ -1,24 +1,30 @@
+# ONT host removal: keep reads minimap2 leaves unmapped (SAM flag 4). No SAM on disk.
+
 rule nano_dehost:
     input:
-        fastq = INPUT["long_reads"] / "{sample}.fastq",
-        ref = REFERENCE_HUMAN
+        fq=DATA / config["reads"]["ont"],
+        mmi=rules.minimap2_index.output.mmi,
     output:
-        sam = BASE / config["output"]["dehost"]["sam"] / "{sample}.sam",
-        unmapped = BASE / config["output"]["dehost"]["sam"] / "{sample}.unmapped.names",
-        copied = BASE / config["output"]["dehost"]["result"] / "{sample}.unmapped.names",
-        dehosted = BASE / config["output"]["dehost"]["sam"] / "nano.{sample}.dehost.fq.gz"
-    params:
-        minimap2_options = config["minimap2"]["options"]
-    threads:
-        config["threads"]["dehost"]
+        fq=temp(TMP / "dehost" / "{sample}.ont.fastq.gz"),
+    container:
+        sif("dehost")
+    threads: res("nano_dehost", "threads")
+    resources:
+        mem_mb=res("nano_dehost", "mem_mb"),
+        runtime=res("nano_dehost", "runtime"),
+    log:
+        "logs/nano_dehost/{sample}.log",
+    benchmark:
+        "benchmarks/nano_dehost/{sample}.tsv"
     shell:
         """
-        source activate nanosoft
-        minimap2 {params.minimap2_options} -t {threads} {input.ref} {input.fastq} > {output.sam}
-        awk '($$2==4){{print $$1}}' {output.sam} > {output.unmapped}
-        cp {output.unmapped} {output.copied}
-        tmp=$(mktemp tmp.{wildcards.sample}.XXXX.fq)
-        seqkit grep -f {output.unmapped} {input.fastq} > "$tmp"
-        gzip -c "$tmp" > {output.dehosted}
-        rm -f "$tmp"
+        (minimap2 -ax map-ont -t {threads} {input.mmi} {input.fq} \
+            | samtools fastq -f 4 - \
+            | pigz -p {threads} > {output.fq}) 2> {log}
+        # Read counts; -f passes uncompressed input through.
+        n_in=$(( $(pigz -dcf {input.fq} | wc -l) / 4 ))
+        n_kept=$(( $(pigz -dc {output.fq} | wc -l) / 4 ))
+        echo "ont_reads_in: $n_in" >> {log}
+        echo "ont_reads_kept: $n_kept" >> {log}
+        echo "ont_host_reads: $(( n_in - n_kept ))" >> {log}
         """
