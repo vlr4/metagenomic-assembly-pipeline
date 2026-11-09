@@ -1,5 +1,22 @@
-# SLURM profile (snakemake-executor-plugin-slurm).
+# SLURM profile (snakemake-executor-plugin-slurm). Run dir and all data on scratch.
 executor: slurm
 software-deployment-method: apptainer
-apptainer-args: "--cleanenv"
+apptainer-args: "--cleanenv --bind /mnt/shared/scratch/$USER --bind $HOME"
 printshellcmds: true
+jobs: 50
+# Shared filesystem (BeeGFS): allow for metadata lag on job outputs.
+latency-wait: 120
+rerun-incomplete: true
+keep-going: true
+
+# Account and partition: cluster defaults (medium, 24 h). Partition limits: short/hicpu 6 h,
+# medium 24 h, long/himem 14 d. Per user and queue: max 256 cores; max 256 GB in use on every
+# queue except himem (himem: no memory cap, min 32 GB per job). Limits count per queue.
+# spades (250 GB) on himem: on long only one could run at a time.
+set-resources:
+  spades:
+    slurm_partition: "himem"
+  binning:
+    slurm_partition: "long"
+  reassemble_bins:
+    slurm_partition: "long"
