@@ -14,6 +14,7 @@ apptainer build $SIF/dehost.sif containers/dehost.def
 apptainer build $SIF/metawrap2_2.1.3.sif containers/metawrap2.def
 apptainer pull $SIF/spades_4.3.0.sif docker://quay.io/biocontainers/spades:4.3.0--hde4eca7_2
 apptainer pull $SIF/drep_3.7.1.sif docker://quay.io/biocontainers/drep:3.7.1--pyhdfd78af_0
+apptainer pull $SIF/seqkit_2.14.0.sif docker://quay.io/biocontainers/seqkit:2.14.0--hb192632_0
 sha256sum $SIF/*.sif   # compare with the table below
 ```
 
@@ -25,6 +26,7 @@ sha256sum $SIF/*.sif   # compare with the table below
 | `spades_4.3.0.sif` | `docker://quay.io/biocontainers/spades:4.3.0--hde4eca7_2` | 141 MB | `a284dda57683ca80808e9ce84b41504b7d82b301f2d3a241d0636b48b4ee8a2c` |
 | `metawrap2_2.1.3.sif` | `containers/metawrap2.def` (base `condaforge/miniforge3:26.7.2-0`) | 6.2 GB | `b0288c36b399e6ac5329a825644c9d8992edaca8eee03a38c20e250b393c5d0f` |
 | `drep_3.7.1.sif` | `docker://quay.io/biocontainers/drep:3.7.1--pyhdfd78af_0` | 593 MB | `1443cc7c8e2457cd66f8d8e557f200ac045ed882193d11f8e5e77947936c82a6` |
+| `seqkit_2.14.0.sif` | `docker://quay.io/biocontainers/seqkit:2.14.0--hb192632_0` | 14 MB | `058aa4a333eb9b84379d3ded6b46048e0ff230a0d94380fa852e881de74d1602` |
 
 ## dehost
 
@@ -56,7 +58,7 @@ mamba 2.9.0. Envs built from upstream `src/metawrap2/envs/locks/<env>.linux-64.l
 | | | bowtie2 | 2.5.5 |
 | | | minimap2 | 2.31-r1302 |
 | | | samtools | 1.24 |
-| metawrap2-bins | binning | MetaBAT2 | 2.18 |
+| metawrap2-bins | binning, mag_coverage | MetaBAT2 | 2.18 |
 | | | MaxBin2 | 2.2.7 |
 | | | CONCOCT | 1.1.0 |
 | | | minimap2 / samtools | 2.31-r1302 / 1.24 |
@@ -81,3 +83,9 @@ mamba 2.9.0. Envs built from upstream `src/metawrap2/envs/locks/<env>.linux-64.l
 | MUMmer (nucmer) | 4.0.1 |
 | Prodigal | 2.6.3 |
 | CheckM1 | present (unused) |
+
+## seqkit
+
+| Tool | Version |
+|---|---|
+| SeqKit | 2.14.0 |

@@ -72,6 +72,7 @@ if not SAMPLES:
 wildcard_constraints:
     sample="|".join(SAMPLES),
     assembly_type="hybrid|illumina",
+    platform="illumina|ont",
 
 
 ##### load rules #####
@@ -79,12 +80,14 @@ wildcard_constraints:
 include: "rules/databases.smk"
 include: "rules/nano_dehost.smk"
 include: "rules/read_qc.smk"
+include: "rules/read_stats.smk"
 include: "rules/assembly.smk"
 include: "rules/binning.smk"
 include: "rules/bin_refinement.smk"
 include: "rules/reassembly.smk"
 include: "rules/summarize_bins.smk"
 include: "rules/dereplication.smk"
+include: "rules/mag_coverage.smk"
 
 ##### entry point #####
 rule all:
@@ -92,6 +95,12 @@ rule all:
     input:
         rules.databases.input,
         expand(SHARED / "read_qc" / "{sample}" / "fastp.json", sample=SAMPLES),
+        # ONT stats only when an assembly type uses ONT reads.
+        expand(
+            rules.read_stats.output,
+            sample=SAMPLES,
+            platform=["illumina", "ont"] if "hybrid" in ASSEMBLY_TYPES else ["illumina"],
+        ),
         expand(
             TMP / "bin_refinement" / "{sample}" / f"{REFINED}.contigs.tsv",
             sample=SAMPLES,
@@ -99,3 +108,4 @@ rule all:
         ),
         expand(rules.summarize_bins.output, assembly_type=ASSEMBLY_TYPES),
         expand(rules.drep.output.final, assembly_type=ASSEMBLY_TYPES),
+        expand(rules.mag_coverage.output.table, assembly_type=ASSEMBLY_TYPES),
