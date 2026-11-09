@@ -20,9 +20,9 @@ rule bin_refinement:
         mem_mb=res("bin_refinement", "mem_mb"),
         runtime=res("bin_refinement", "runtime"),
     log:
-        "logs/bin_refinement/{sample}.log",
+        "logs/{assembly_type}/bin_refinement/{sample}.log",
     benchmark:
-        "benchmarks/bin_refinement/{sample}.tsv"
+        "benchmarks/{assembly_type}/bin_refinement/{sample}.tsv"
     shell:
         """
         # MetaWrap2 2.1.3 reads CHECKM2DB from $METAWRAP2_CONFIG, not from --config.

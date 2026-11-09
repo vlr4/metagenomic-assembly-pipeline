@@ -8,9 +8,9 @@ rule read_qc:
         srprism=rules.srprism.output,
         toml=rules.metawrap2_config.output.toml,
     output:
-        r1=temp(TMP / "read_qc" / "{sample}" / "final_pure_reads_1.fastq"),
-        r2=temp(TMP / "read_qc" / "{sample}" / "final_pure_reads_2.fastq"),
-        report=TMP / "read_qc" / "{sample}" / "fastp.json",
+        r1=temp(SHARED / "read_qc" / "{sample}" / "final_pure_reads_1.fastq"),
+        r2=temp(SHARED / "read_qc" / "{sample}" / "final_pure_reads_2.fastq"),
+        report=SHARED / "read_qc" / "{sample}" / "fastp.json",
     params:
         outdir=lambda wildcards, output: Path(output.report).parent,
         host=HOST,

@@ -2,12 +2,14 @@
 
 rule summarize_bins:
     input:
-        bins=expand(TMP / "reassembly_select" / "{sample}" / "bins", sample=SAMPLES),
-        stats=expand(TMP / "reassembly_select" / "{sample}" / "bins.stats.tsv", sample=SAMPLES),
+        bins=expand(TMP / "reassembly_select" / "{sample}" / "bins", sample=SAMPLES, allow_missing=True),
+        stats=expand(
+            TMP / "reassembly_select" / "{sample}" / "bins.stats.tsv", sample=SAMPLES, allow_missing=True
+        ),
     output:
-        bins=directory(RES / "metawrap_bins" / "hybrid" / "bins"),
-        info=RES / "metawrap_bins" / "hybrid" / "hybrid_genomeInfo.csv",
-        table=RES / "metawrap_bins" / "hybrid" / "hybrid_bins.tsv",
+        bins=directory(RES / "metawrap_bins" / "{assembly_type}" / "bins"),
+        info=RES / "metawrap_bins" / "{assembly_type}" / "{assembly_type}_genomeInfo.csv",
+        table=RES / "metawrap_bins" / "{assembly_type}" / "{assembly_type}_bins.tsv",
     params:
         script=SCRIPTS / "summarize_bins.py",
         samples=" ".join(SAMPLES),
@@ -18,9 +20,9 @@ rule summarize_bins:
         mem_mb=res("summarize_bins", "mem_mb"),
         runtime=res("summarize_bins", "runtime"),
     log:
-        "logs/summarize_bins.log",
+        "logs/{assembly_type}/summarize_bins.log",
     benchmark:
-        "benchmarks/summarize_bins.tsv"
+        "benchmarks/{assembly_type}/summarize_bins.tsv"
     shell:
         """
         python {params.script} --samples {params.samples} --bins {input.bins} \

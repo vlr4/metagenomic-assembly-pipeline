@@ -1,4 +1,4 @@
-# Reassembly: MetaWrap2 reassemble_bins (strict/permissive, with ONT reads),
+# Reassembly: MetaWrap2 reassemble_bins (strict/permissive; ONT reads for the hybrid type),
 # then selection of the best version of each bin with CheckM2.
 
 rule reassemble_bins:
@@ -6,12 +6,13 @@ rule reassemble_bins:
         bins=rules.bin_refinement.output.bins,
         r1=rules.read_qc.output.r1,
         r2=rules.read_qc.output.r2,
-        ont=rules.nano_dehost.output.fq,
+        ont=ont_reads,
         toml=rules.metawrap2_config.output.toml,
     output:
         outdir=directory(TMP / "reassembly" / "{sample}"),
     params:
         mem_gb=mem_gb,
+        nanopore=nanopore_flag,
     container:
         sif("metawrap2")
     threads: res("reassemble_bins", "threads")
@@ -19,15 +20,15 @@ rule reassemble_bins:
         mem_mb=res("reassemble_bins", "mem_mb"),
         runtime=res("reassemble_bins", "runtime"),
     log:
-        "logs/reassemble_bins/{sample}.log",
+        "logs/{assembly_type}/reassemble_bins/{sample}.log",
     benchmark:
-        "benchmarks/reassemble_bins/{sample}.tsv"
+        "benchmarks/{assembly_type}/reassemble_bins/{sample}.tsv"
     shell:
         """
         if ls {input.bins}/*.fasta > /dev/null 2>&1; then
             metawrap2 --force reassemble_bins --config {input.toml} \
                 -o {output.outdir} -b {input.bins} -1 {input.r1} -2 {input.r2} \
-                --nanopore {input.ont} -t {threads} -m {params.mem_gb} -c {COMP} -x {CONT} \
+                {params.nanopore} -t {threads} -m {params.mem_gb} -c {COMP} -x {CONT} \
                 --skip-checkm > {log} 2>&1
             rm -rf {output.outdir}/reads_for_reassembly {output.outdir}/reassemblies \
                 {output.outdir}/binned_assembly
@@ -55,9 +56,9 @@ rule reassembly_select:
         mem_mb=res("reassembly_select", "mem_mb"),
         runtime=res("reassembly_select", "runtime"),
     log:
-        "logs/reassembly_select/{sample}.log",
+        "logs/{assembly_type}/reassembly_select/{sample}.log",
     benchmark:
-        "benchmarks/reassembly_select/{sample}.tsv"
+        "benchmarks/{assembly_type}/reassembly_select/{sample}.tsv"
     shell:
         """
         cand={params.workdir}/candidates

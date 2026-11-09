@@ -23,8 +23,15 @@ HOST = config["host"]["name"]
 SCRIPTS = Path(workflow.basedir) / "scripts"
 
 # Outputs are relative to the Snakemake working directory (--directory <run dir>).
-TMP = Path("hybrid_temp")
+# Per-assembly-type intermediates under {assembly_type}_temp; type-independent ones under shared_temp.
+TMP = Path("{assembly_type}_temp")
+SHARED = Path("shared_temp")
 RES = Path("result")
+
+ASSEMBLY_TYPES = config["assembly_types"]
+_unknown = set(ASSEMBLY_TYPES) - {"hybrid", "illumina"}
+if _unknown:
+    raise WorkflowError(f"unknown assembly_types: {sorted(_unknown)}")
 
 COMP = config["thresholds"]["completeness"]
 CONT = config["thresholds"]["contamination"]
@@ -43,6 +50,15 @@ def mem_gb(wildcards, resources):
     return max(1, resources.mem_mb // 1024)
 
 
+def ont_reads(wildcards):
+    # Only the hybrid assembly uses ONT reads.
+    return rules.nano_dehost.output.fq if wildcards.assembly_type == "hybrid" else []
+
+
+def nanopore_flag(wildcards, input):
+    return f"--nanopore {input.ont}" if wildcards.assembly_type == "hybrid" else ""
+
+
 ##### samples #####
 SAMPLE_SHEET = DATA / config["samples"]
 if not SAMPLE_SHEET.is_file():
@@ -55,6 +71,7 @@ if not SAMPLES:
 
 wildcard_constraints:
     sample="|".join(SAMPLES),
+    assembly_type="hybrid|illumina",
 
 
 ##### load rules #####
@@ -74,7 +91,11 @@ rule all:
     default_target: True
     input:
         rules.databases.input,
-        expand(TMP / "read_qc" / "{sample}" / "fastp.json", sample=SAMPLES),
-        expand(TMP / "bin_refinement" / "{sample}" / f"{REFINED}.contigs.tsv", sample=SAMPLES),
-        rules.summarize_bins.output,
-        rules.drep.output.final,
+        expand(SHARED / "read_qc" / "{sample}" / "fastp.json", sample=SAMPLES),
+        expand(
+            TMP / "bin_refinement" / "{sample}" / f"{REFINED}.contigs.tsv",
+            sample=SAMPLES,
+            assembly_type=ASSEMBLY_TYPES,
+        ),
+        expand(rules.summarize_bins.output, assembly_type=ASSEMBLY_TYPES),
+        expand(rules.drep.output.final, assembly_type=ASSEMBLY_TYPES),

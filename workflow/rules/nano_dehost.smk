@@ -5,7 +5,7 @@ rule nano_dehost:
         fq=DATA / config["reads"]["ont"],
         mmi=rules.minimap2_index.output.mmi,
     output:
-        fq=temp(TMP / "dehost" / "{sample}.ont.fastq.gz"),
+        fq=temp(SHARED / "dehost" / "{sample}.ont.fastq.gz"),
     container:
         sif("dehost")
     threads: res("nano_dehost", "threads")

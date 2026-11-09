@@ -1,12 +1,12 @@
-# Dereplication (all samples): dRep with Chen's parameters, CheckM2 stats as genomeInfo.
+# Dereplication (all samples of one assembly type; types are not pooled): dRep with Chen's parameters, CheckM2 stats as genomeInfo.
 
 rule drep:
     input:
         bins=rules.summarize_bins.output.bins,
         info=rules.summarize_bins.output.info,
     output:
-        work=directory(TMP / "drep" / "hybrid"),
-        final=directory(RES / "drep_bins" / "hybrid" / "dereplicated_genomes"),
+        work=directory(TMP / "drep" / "{assembly_type}"),
+        final=directory(RES / "drep_bins" / "{assembly_type}" / "dereplicated_genomes"),
     params:
         drep=config["drep"]["params"],
     container:
@@ -16,9 +16,9 @@ rule drep:
         mem_mb=res("drep", "mem_mb"),
         runtime=res("drep", "runtime"),
     log:
-        "logs/drep.log",
+        "logs/{assembly_type}/drep.log",
     benchmark:
-        "benchmarks/drep.tsv"
+        "benchmarks/{assembly_type}/drep.tsv"
     shell:
         """
         dRep dereplicate {output.work} -g {input.bins}/*.fa \

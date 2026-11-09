@@ -15,6 +15,9 @@ reads:
   illumina_r1: "illumina/{sample}_1.fastq"
   illumina_r2: "illumina/{sample}_2.fastq"
 
+# Assemblies to run: hybrid (Illumina PE + ONT), illumina (Illumina PE only).
+assembly_types: ["hybrid", "illumina"]
+
 containers:
   dehost: "dehost.sif"
   spades: "spades_4.3.0.sif"

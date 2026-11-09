@@ -163,7 +163,7 @@ rule metawrap2_config:
         checkm2=rules.checkm2_db.output.dmnd,
         gunc=rules.gunc_db.output.dmnd if config["gunc"]["enabled"] else [],
     output:
-        toml=TMP / "metawrap2.toml",
+        toml=SHARED / "metawrap2.toml",
     params:
         bmtagger_db=HOST_DIR,
         gunc_line=f'GUNC_DB = "{GUNC_DMND}"' if config["gunc"]["enabled"] else "",

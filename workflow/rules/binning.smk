@@ -22,9 +22,9 @@ rule binning:
         mem_mb=res("binning", "mem_mb"),
         runtime=res("binning", "runtime"),
     log:
-        "logs/binning/{sample}.log",
+        "logs/{assembly_type}/binning/{sample}.log",
     benchmark:
-        "benchmarks/binning/{sample}.tsv"
+        "benchmarks/{assembly_type}/binning/{sample}.tsv"
     shell:
         """
         metawrap2 --force binning --config {input.toml} \
