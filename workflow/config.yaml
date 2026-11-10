@@ -50,7 +50,9 @@ read_qc:
 
 # Written into the generated metawrap2.toml (thread/memory limits set to 1.0).
 metawrap2:
-  max_disk_fraction: 0.7
+  # Fraction of the whole filesystem in use; on shared scratch (BeeGFS, ~75% full from other users)
+  # any lower ceiling stops every MetaWrap2 module before it starts.
+  max_disk_fraction: 1.0
 
 drep:
   # -comp/-con come from thresholds.
